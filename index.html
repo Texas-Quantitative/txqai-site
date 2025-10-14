@@ -1,79 +1,121 @@
-<!-- HERO (drop-in replacement) -->
-<section class="relative overflow-hidden bg-white">
-  <!-- Background: subtle grid + soft glow -->
-  <div class="absolute inset-0 -z-10">
-    <img src="./bg-grid.svg" alt="" aria-hidden="true"
-         class="w-full h-full object-cover opacity-90">
-    <div class="pointer-events-none absolute -inset-32 opacity-50 blur-3xl"
-         style="background:
-           radial-gradient(600px 240px at 70% 30%, rgba(14,165,233,0.35), transparent 70%),
-           radial-gradient(520px 220px at 30% 70%, rgba(52,211,153,0.25), transparent 70%);">
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Texas Quantitative — Private AI for Finance & Operations</title>
+  <meta name="description" content="Private, domain-specific AI for finance and operations.">
+  <link rel="icon" href="favicon.ico">
+  <!-- Tailwind CDN (simple, no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tq: { ink: '#0b1220', sky: '#0ea5e9', steel: '#1f2937', mint: '#34d399', sand: '#f3f4f6' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .container { max-width: 72rem; }
+  </style>
+</head>
+<body class="bg-white text-tq-ink antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-100">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="./" class="font-semibold tracking-tight">Texas Quantitative</a>
+      <nav class="hidden md:flex gap-6">
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./work.html">Work</a>
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./approach.html">Approach</a>
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./about.html">About</a>
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./contact.html">Contact</a>
+      </nav>
+      <a href="./contact.html" class="inline-block text-sm px-4 py-2 rounded-lg bg-tq-sky text-white hover:opacity-90">Start a Discovery Sprint</a>
     </div>
-  </div>
-
-  <div class="container mx-auto grid max-w-[72rem] px-4 py-20 md:grid-cols-2 md:gap-12 items-center">
-    <!-- Copy -->
-    <div class="relative">
-      <p class="inline-flex items-center gap-2 text-sm font-medium text-tq-sky">
-        <span class="h-2 w-2 rounded-full bg-tq-sky animate-pulse"></span>
-        Applied Intelligence
-      </p>
-
-      <h1 class="mt-3 text-4xl md:text-6xl font-semibold tracking-tight text-tq-ink">
-        Private AI. <span class="text-tq-sky">Real insight.</span> Measurable action.
-      </h1>
-
-      <p class="mt-5 max-w-xl text-lg text-gray-700">
+  </header>
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-tq-sky/10 to-tq-mint/10 -z-10"></div>
+    <div class="container mx-auto px-4 py-20">
+      <p class="text-tq-sky font-medium">Applied Intelligence</p>
+      <h1 class="mt-2 text-4xl md:text-6xl font-semibold tracking-tight">Private AI. Real insight. Measurable action.</h1>
+      <p class="mt-5 max-w-2xl text-lg text-gray-600">
         We combine domain-trained LLMs and Graph Neural Networks to bring clarity to complex finance and operations —
         from rate swap risk to intelligent treasury and CRM enablement.
       </p>
-
-      <div class="mt-8 flex flex-wrap items-center gap-3">
-        <a href="./contact.html"
-           class="inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-tq-sky text-white shadow-sm hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-tq-sky transition">
-          Start a Discovery Sprint
-        </a>
-        <a href="./work.html"
-           class="inline-flex items-center justify-center px-5 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 text-tq-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300 transition">
-          See our work
-        </a>
-      </div>
-
-      <!-- Trust strip (optional placeholders) -->
-      <div class="mt-10">
-        <p class="text-xs uppercase tracking-wider text-gray-500">Trusted for treasury, risk & operations</p>
-        <div class="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-gray-400">
-          <span class="h-6 inline-flex items-center">• Bank Desk</span>
-          <span class="h-6 inline-flex items-center">• CRM Enablement</span>
-          <span class="h-6 inline-flex items-center">• Diagnostics</span>
-        </div>
+      <div class="mt-8 flex gap-3">
+        <a href="./contact.html" class="px-5 py-3 rounded-lg bg-tq-sky text-white hover:opacity-90">Start a Discovery Sprint</a>
+        <a href="./work.html" class="px-5 py-3 rounded-lg border border-gray-200 hover:bg-gray-50">See our work</a>
       </div>
     </div>
+  </section>
 
-    <!-- Illustration -->
-    <div class="relative mt-14 md:mt-0">
-      <!-- Soft lights (decorative) -->
-      <div class="absolute -inset-6 opacity-40 blur-3xl pointer-events-none"
-           style="background:
-             radial-gradient(480px 180px at 60% 35%, rgba(14,165,233,0.45), transparent 70%),
-             radial-gradient(360px 160px at 40% 70%, rgba(52,211,153,0.35), transparent 70%);">
-      </div>
-
-      <img src="./hero-network.svg" alt="Network of connected nodes representing explainable intelligence"
-           class="relative w-full h-auto drop-shadow-lg
-                  motion-safe:translate-y-0 motion-safe:opacity-100
-                  motion-safe:animate-[fadeInUp_700ms_ease-out_100ms_both]">
+  <!-- Features -->
+  <section class="container mx-auto px-4 mt-16 grid md:grid-cols-3 gap-6">
+    <div class="rounded-2xl border border-gray-100 p-6 hover:shadow-sm transition">
+      <h3 class="font-semibold">Financial Savvy API</h3>
+      <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+        A secure intelligence layer for banks and treasuries.
+        Conversational risk, exposure, and liquidity insights — Azure-native, compliant by design.
+      </p>
     </div>
-  </div>
+    <div class="rounded-2xl border border-gray-100 p-6 hover:shadow-sm transition">
+      <h3 class="font-semibold">Risk & Treasury Systems</h3>
+      <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+        Adaptive Treasury and Risk Studio deliver explainable, graph-first analytics to optimize cash and manage portfolio risk.
+      </p>
+    </div>
+    <div class="rounded-2xl border border-gray-100 p-6 hover:shadow-sm transition">
+      <h3 class="font-semibold">Business Operations Consulting</h3>
+      <p class="mt-2 text-gray-600 text-sm leading-relaxed">
+        Two-week discovery sprints and rapid MVPs that turn your workflows and data into measurable outcomes.
+      </p>
+    </div>
+  </section>
 
-  <!-- Keyframe (inline) for subtle entry; respects reduced motion -->
-  <style>
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .motion-safe\:animate-\[fadeInUp_700ms_ease-out_100ms_both] { animation: none !important; }
-    }
-  </style>
-</section>
+  <!-- Results -->
+  <section class="container mx-auto px-4 mt-20">
+    <h2 class="text-2xl font-semibold">Selected results</h2>
+    <div class="mt-6 grid md:grid-cols-3 gap-6 text-sm">
+      <div class="rounded-2xl border border-gray-100 p-6">
+        <p class="font-medium">Bank swap desk</p>
+        <p class="mt-2 text-gray-600">Mapped $8.25B swap book (incl. $4.5B Bermudan cancelables) and designed AI-enabled OMS & valuation workflow.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-100 p-6">
+        <p class="font-medium">Marketing + CRM</p>
+        <p class="mt-2 text-gray-600">Deployed private LLM assistant to accelerate AE workflows and unify account intelligence.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-100 p-6">
+        <p class="font-medium">Diagnostics</p>
+        <p class="mt-2 text-gray-600">Designed HIPAA-aligned RAG platform for learning diagnostics with secure case-management integration.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container mx-auto px-4 my-24">
+    <div class="rounded-2xl bg-tq-ink text-white p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <h2 class="text-2xl font-semibold">Ready to see Applied Intelligence in action?</h2>
+        <p class="mt-2 text-gray-200">Kick off a 2-week Discovery Sprint to map value, data, and an MVP path.</p>
+      </div>
+      <a href="./contact.html" class="px-5 py-3 rounded-lg bg-tq-sky text-white hover:opacity-90">Start a Discovery Sprint</a>
+    </div>
+  </section>
+  <!-- Footer -->
+  <footer class="mt-24 border-t border-gray-100">
+    <div class="container mx-auto px-4 py-10 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p>© <span id="year"></span> Texas Quantitative. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a href="./privacy.html" class="hover:text-tq-sky">Privacy</a>
+        <a href="./contact.html" class="hover:text-tq-sky">Contact</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
