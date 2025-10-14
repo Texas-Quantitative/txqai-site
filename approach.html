@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Approach — Texas Quantitative</title>
+  <meta name="description" content="Discover → Design → Build → Scale.">
+  <link rel="icon" href="favicon.ico">
+  <!-- Tailwind CDN (simple, no build step) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tq: { ink: '#0b1220', sky: '#0ea5e9', steel: '#1f2937', mint: '#34d399', sand: '#f3f4f6' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .container { max-width: 72rem; }
+  </style>
+</head>
+<body class="bg-white text-tq-ink antialiased">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-100">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="./" class="font-semibold tracking-tight">Texas Quantitative</a>
+      <nav class="hidden md:flex gap-6">
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./work.html">Work</a>
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./approach.html">Approach</a>
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./about.html">About</a>
+        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./contact.html">Contact</a>
+      </nav>
+      <a href="./contact.html" class="inline-block text-sm px-4 py-2 rounded-lg bg-tq-sky text-white hover:opacity-90">Start a Discovery Sprint</a>
+    </div>
+  </header>
+  <section class="container mx-auto px-4 py-16">
+    <h1 class="text-3xl font-semibold">Our Approach</h1>
+    <div class="mt-6 grid md:grid-cols-4 gap-6 text-sm">
+      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Discover</h3><p class="mt-2 text-gray-600">Two-week sprint to map data, workflows, and value thesis.</p></div>
+      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Design</h3><p class="mt-2 text-gray-600">Target use cases, security model, and success metrics.</p></div>
+      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Build</h3><p class="mt-2 text-gray-600">Rapid MVP with measurable outcomes in 6–8 weeks.</p></div>
+      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Scale</h3><p class="mt-2 text-gray-600">Harden, integrate, and evolve into a product.</p></div>
+    </div>
+  </section>
+  <!-- Footer -->
+  <footer class="mt-24 border-t border-gray-100">
+    <div class="container mx-auto px-4 py-10 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p>© <span id="year"></span> Texas Quantitative. All rights reserved.</p>
+      <div class="flex gap-6">
+        <a href="./privacy.html" class="hover:text-tq-sky">Privacy</a>
+        <a href="./contact.html" class="hover:text-tq-sky">Contact</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
