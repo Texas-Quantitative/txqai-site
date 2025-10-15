@@ -1,7 +1,68 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <section class="container mx-auto px-4 py-20">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-semibold text-gray-900 mb-8">Start a Discovery Sprint</h1>
+        <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          Tell us about your team and goals. We'll reply within one business day to schedule your two-week discovery sprint.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <div class="space-y-8">
+          <div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">What to expect</h3>
+            <div class="space-y-4">
+              <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-lg bg-tq-sky/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-tq-sky font-semibold text-sm">1</span>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-900 mb-1">Discovery Call</h4>
+                  <p class="text-gray-600 text-sm">Initial 30-minute conversation about your goals and current state</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-lg bg-tq-mint/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-tq-mint font-semibold text-sm">2</span>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-900 mb-1">Sprint Planning</h4>
+                  <p class="text-gray-600 text-sm">Map data sources, workflows, and success metrics</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-lg bg-tq-steel/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span class="text-tq-steel font-semibold text-sm">3</span>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-900 mb-1">MVP Roadmap</h4>
+                  <p class="text-gray-600 text-sm">Deliverable roadmap with technical architecture and timeline</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border-2 border-gray-200 p-8 hover:border-tq-sky/30 transition-all duration-300 shadow-sm">
+          <form id="contactForm" class="space-y-6">
+            <div class="space-y-4">
+              <input class="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 placeholder-gray-500 focus:border-tq-sky focus:outline-none transition-colors" name="name" placeholder="Your name" required />
+              <input class="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 placeholder-gray-500 focus:border-tq-sky focus:outline-none transition-colors" name="email" type="email" placeholder="Work email" required />
+              <input class="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 placeholder-gray-500 focus:border-tq-sky focus:outline-none transition-colors" name="company" placeholder="Company" />
+              <textarea class="w-full border-2 border-gray-200 rounded-xl px-4 py-4 text-gray-900 placeholder-gray-500 focus:border-tq-sky focus:outline-none transition-colors min-h-32 resize-none" name="message" placeholder="What outcome are you targeting? What's your current challenge?"></textarea>
+            </div>
+            <button class="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-tq-sky to-tq-mint text-white font-medium hover:from-tq-sky/90 hover:to-tq-mint/90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5" type="submit">
+              Start Discovery Sprint
+            </button>
+            <p id="status" class="text-sm text-gray-600 text-center"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>et="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Contact — Texas Quantitative</title>
   <meta name="description" content="Start a Discovery Sprint.">
@@ -25,19 +86,41 @@
 </head>
 <body class="bg-white text-tq-ink antialiased">
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-100">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="./" class="font-semibold tracking-tight">Texas Quantitative</a>
-      <nav class="hidden md:flex gap-6">
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./work.html">Work</a>
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./approach.html">Approach</a>
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./about.html">About</a>
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./contact.html">Contact</a>
+  <header class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between relative">
+        <!-- Left section: Badge -->
+        <div class="flex items-center">
+          <div class="inline-flex items-center px-4 py-2 rounded-full border border-tq-sky/20 bg-tq-sky/5">
+            <span class="text-tq-sky text-sm font-medium">AI that works</span>
+          </div>
+        </div>
+        
+        <!-- Center section: Logo -->
+        <div class="absolute left-1/2 transform -translate-x-1/2">
+          <a href="./" class="flex items-center group">
+            <img src="./images/white-narrow.png" alt="Texas Quantitative" class="h-16 group-hover:opacity-80 transition-opacity">
+          </a>
+        </div>
+        
+        <!-- Right section: CTA -->
+        <a href="./contact.html" class="px-6 py-2.5 text-white rounded-lg text-sm font-medium transition-all hover:shadow-lg" style="background: linear-gradient(135deg, #0ea5e9, #34d399);">
+          Discovery Sprint
+        </a>
+      </div>
+      
+      <!-- Navigation below header -->
+      <nav class="hidden md:flex items-center justify-center gap-8 pt-4 border-t border-gray-100 mt-4">
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./">Home</a>
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./work.html">Work</a>
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./approach.html">Approach</a>
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./about.html">About</a>
+        <a class="text-sm font-medium text-tq-sky border-b-2 border-tq-sky pb-1" href="./contact.html" aria-current="page">Contact</a>
       </nav>
-      <a href="./contact.html" class="inline-block text-sm px-4 py-2 rounded-lg bg-tq-sky text-white hover:opacity-90">Start a Discovery Sprint</a>
+      </div>
     </div>
   </header>
-  <section class="container mx-auto px-4 py-16">
+  <section class="container mx-auto px-4 pt-40 pb-20">
     <h1 class="text-3xl font-semibold">Start a Discovery Sprint</h1>
     <p class="mt-3 text-gray-600">Tell us a bit about your team and goals. We’ll reply within one business day.</p>
 
@@ -79,13 +162,16 @@
     });
   </script>
   <!-- Footer -->
-  <footer class="mt-24 border-t border-gray-100">
-    <div class="container mx-auto px-4 py-10 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-4">
-      <p>© <span id="year"></span> Texas Quantitative. All rights reserved.</p>
-      <div class="flex gap-6">
-        <a href="./privacy.html" class="hover:text-tq-sky">Privacy</a>
-        <a href="./contact.html" class="hover:text-tq-sky">Contact</a>
+  <footer class="mt-24 border-t border-gray-200 bg-tq-sand/30">
+    <div class="container mx-auto px-4 py-12 text-sm text-gray-600 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+        <p class="font-medium">© <span id="year"></span> Texas Quantitative. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a href="./privacy.html" class="hover:text-tq-sky transition-colors">Privacy Policy</a>
+          <a href="./contact.html" class="hover:text-tq-sky transition-colors">Contact</a>
+        </div>
       </div>
+      <p class="text-xs text-gray-500">Private AI for Finance & Operations</p>
     </div>
   </footer>
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>

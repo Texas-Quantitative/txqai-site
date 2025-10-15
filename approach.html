@@ -25,37 +25,130 @@
 </head>
 <body class="bg-white text-tq-ink antialiased">
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-gray-100">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="./" class="font-semibold tracking-tight">Texas Quantitative</a>
-      <nav class="hidden md:flex gap-6">
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./work.html">Work</a>
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./approach.html">Approach</a>
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./about.html">About</a>
-        <a class="text-sm text-gray-700 hover:text-tq-sky" href="./contact.html">Contact</a>
+  <header class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur border-b border-gray-200 shadow-sm">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between relative">
+        <!-- Left section: Badge -->
+        <div class="flex items-center">
+          <div class="inline-flex items-center px-2 sm:px-4 py-1 sm:py-2 rounded-full border border-tq-sky/20 bg-tq-sky/5">
+            <span class="text-tq-sky text-xs sm:text-sm font-medium">
+              <span class="block sm:inline">AI that</span>
+              <span class="block sm:inline sm:ml-1">works</span>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Center section: Logo -->
+        <div class="absolute left-1/2 transform -translate-x-1/2">
+          <a href="./" class="flex items-center group">
+            <img src="./images/white-narrow.png" alt="Texas Quantitative" class="h-12 sm:h-16 group-hover:opacity-80 transition-opacity">
+          </a>
+        </div>
+        
+        <!-- Right section: CTA and Mobile Menu -->
+        <div class="flex items-center gap-2">
+          <a href="./contact.html" class="px-3 sm:px-6 py-2 sm:py-2.5 text-white rounded-lg text-xs sm:text-sm font-medium transition-all hover:shadow-lg" style="background: linear-gradient(135deg, #0ea5e9, #34d399);">
+            <span class="block sm:inline">Discovery</span>
+            <span class="block sm:inline sm:ml-1">Sprint</span>
+          </a>
+          
+          <!-- Mobile menu button -->
+          <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center justify-center gap-8 pt-4 border-t border-gray-100 mt-4">
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./">Home</a>
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./work.html">Work</a>
+        <a class="text-sm font-medium text-tq-sky border-b-2 border-tq-sky pb-1" href="./approach.html" aria-current="page">Approach</a>
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./about.html">About</a>
+        <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors" href="./contact.html">Contact</a>
       </nav>
-      <a href="./contact.html" class="inline-block text-sm px-4 py-2 rounded-lg bg-tq-sky text-white hover:opacity-90">Start a Discovery Sprint</a>
+      
+      <!-- Mobile Navigation -->
+      <nav id="mobileMenu" class="md:hidden hidden bg-white border-t border-gray-200 mt-4 pt-4 pb-2">
+        <div class="flex flex-col space-y-3">
+          <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors pl-4 py-2 hover:border-l-4 hover:border-tq-sky/20" href="./">Home</a>
+          <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors pl-4 py-2 hover:border-l-4 hover:border-tq-sky/20" href="./work.html">Work</a>
+          <a class="text-sm font-medium text-tq-sky border-l-4 border-tq-sky pl-4 py-2" href="./approach.html" aria-current="page">Approach</a>
+          <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors pl-4 py-2 hover:border-l-4 hover:border-tq-sky/20" href="./about.html">About</a>
+          <a class="text-sm font-medium text-gray-600 hover:text-tq-sky transition-colors pl-4 py-2 hover:border-l-4 hover:border-tq-sky/20" href="./contact.html">Contact</a>
+        </div>
+      </nav>
     </div>
   </header>
-  <section class="container mx-auto px-4 py-16">
-    <h1 class="text-3xl font-semibold">Our Approach</h1>
-    <div class="mt-6 grid md:grid-cols-4 gap-6 text-sm">
-      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Discover</h3><p class="mt-2 text-gray-600">Two-week sprint to map data, workflows, and value thesis.</p></div>
-      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Design</h3><p class="mt-2 text-gray-600">Target use cases, security model, and success metrics.</p></div>
-      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Build</h3><p class="mt-2 text-gray-600">Rapid MVP with measurable outcomes in 6–8 weeks.</p></div>
-      <div class="rounded-2xl border p-6"><h3 class="font-semibold">Scale</h3><p class="mt-2 text-gray-600">Harden, integrate, and evolve into a product.</p></div>
+  <section class="container mx-auto px-4 pt-32 sm:pt-40 pb-20">
+    <div class="text-center mb-16">
+      <h1 class="text-4xl md:text-5xl font-semibold text-gray-900 mb-6">Our Approach</h1>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        From discovery to scale: a structured path to measurable AI outcomes
+      </p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-tq-sky to-tq-mint rounded-2xl opacity-0 group-hover:opacity-100 blur transition-all duration-300"></div>
+        <div class="relative rounded-2xl border-2 border-gray-200 bg-white p-8 hover:border-tq-sky/50 transition-all duration-300">
+          <div class="text-tq-sky font-bold text-4xl mb-4">01</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Discover</h3>
+          <p class="text-gray-600 leading-relaxed">Two-week sprint to map data, workflows, and value thesis.</p>
+        </div>
+      </div>
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-tq-mint to-tq-steel rounded-2xl opacity-0 group-hover:opacity-100 blur transition-all duration-300"></div>
+        <div class="relative rounded-2xl border-2 border-gray-200 bg-white p-8 hover:border-tq-mint/50 transition-all duration-300">
+          <div class="text-tq-mint font-bold text-4xl mb-4">02</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Design</h3>
+          <p class="text-gray-600 leading-relaxed">Target use cases, security model, and success metrics.</p>
+        </div>
+      </div>
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-tq-steel to-tq-sky rounded-2xl opacity-0 group-hover:opacity-100 blur transition-all duration-300"></div>
+        <div class="relative rounded-2xl border-2 border-gray-200 bg-white p-8 hover:border-tq-steel/50 transition-all duration-300">
+          <div class="text-tq-steel font-bold text-4xl mb-4">03</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Build</h3>
+          <p class="text-gray-600 leading-relaxed">Rapid MVP with measurable outcomes in 6–8 weeks.</p>
+        </div>
+      </div>
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-tq-ink to-tq-sky rounded-2xl opacity-0 group-hover:opacity-100 blur transition-all duration-300"></div>
+        <div class="relative rounded-2xl border-2 border-gray-200 bg-white p-8 hover:border-tq-ink/50 transition-all duration-300">
+          <div class="text-tq-ink font-bold text-4xl mb-4">04</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Scale</h3>
+          <p class="text-gray-600 leading-relaxed">Harden, integrate, and evolve into a product.</p>
+        </div>
+      </div>
     </div>
   </section>
   <!-- Footer -->
-  <footer class="mt-24 border-t border-gray-100">
-    <div class="container mx-auto px-4 py-10 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-4">
-      <p>© <span id="year"></span> Texas Quantitative. All rights reserved.</p>
-      <div class="flex gap-6">
-        <a href="./privacy.html" class="hover:text-tq-sky">Privacy</a>
-        <a href="./contact.html" class="hover:text-tq-sky">Contact</a>
+  <footer class="mt-24 border-t border-gray-200 bg-tq-sand/30">
+    <div class="container mx-auto px-4 py-12 text-sm text-gray-600 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+        <p class="font-medium">© <span id="year"></span> Texas Quantitative. All rights reserved.</p>
+        <div class="flex gap-6">
+          <a href="./privacy.html" class="hover:text-tq-sky transition-colors">Privacy Policy</a>
+          <a href="./contact.html" class="hover:text-tq-sky transition-colors">Contact</a>
+        </div>
       </div>
+      <p class="text-xs text-gray-500">Private AI for Finance & Operations</p>
     </div>
   </footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+  </script>
 </body>
 </html>
