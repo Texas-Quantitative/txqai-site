@@ -2,9 +2,14 @@
 
 Following TQFA best practices, this document tracks version releases and changes.
 
-## Current Version: v1.1.1
+## Current Version: v1.1.2
 
 ### Version History
+
+#### v1.1.2 - 2025-10-15
+- **Updated**: LinkedIn URL for Dowell Stackpole across all pages to correct profile
+- **Fixed**: LinkedIn connectivity issue preventing access to founder profile
+- **Enhanced**: Professional social media integration with verified LinkedIn links
 
 #### v1.1.1 - 2025-10-15
 - **Fixed**: Contact page header overlap issue with improved responsive padding
