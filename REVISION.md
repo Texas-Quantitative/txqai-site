@@ -2,9 +2,17 @@
 
 Following TQFA best practices, this document tracks version releases and changes.
 
-## Current Version: v1.1.2
+## Current Version: v1.2.0
 
 ### Version History
+
+#### v1.2.0 - 2025-10-15
+- **Major Feature**: Implemented Formspree contact form integration
+- **Added**: Professional form submission with email notifications
+- **Added**: Loading states, error handling, and success feedback
+- **Added**: Spam protection and form validation
+- **Enhanced**: Contact form now captures and delivers inquiries to business email
+- **Added**: Formspree setup documentation and configuration guide
 
 #### v1.1.2 - 2025-10-15
 - **Updated**: LinkedIn URL for Dowell Stackpole across all pages to correct profile
