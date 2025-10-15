@@ -2,9 +2,13 @@
 
 Following TQFA best practices, this document tracks version releases and changes.
 
-## Current Version: v1.1.0
+## Current Version: v1.1.1
 
 ### Version History
+
+#### v1.1.1 - 2025-10-15
+- **Fixed**: Contact page header overlap issue with improved responsive padding
+- **Enhanced**: Better mobile spacing for contact form header
 
 #### v1.1.0 - 2025-10-15
 - **Major Update**: Complete mobile-responsive redesign
