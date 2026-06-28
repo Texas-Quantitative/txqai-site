@@ -70,7 +70,7 @@
         </div>
 
         <div class="form-card">
-          <form id="contactForm" action="https://ntfy.sh/txqai" method="POST">
+          <form id="contactForm" action="https://ntfy.sh/txqai-leads-j9jhe5r2cdkfcb77" method="POST">
             <input name="name" placeholder="Your name" required />
             <input name="email" type="email" placeholder="Work email" required />
             <input name="company" placeholder="Company" />
@@ -145,7 +145,7 @@
       status.textContent = '';
       status.className = 'form-status';
 
-      fetch('https://ntfy.sh/txqai', { method: 'POST', body: body })
+      fetch('https://ntfy.sh/txqai-leads-j9jhe5r2cdkfcb77', { method: 'POST', body: body })
         .then(response => {
           if (response.ok) {
             status.textContent = "Thank you for your interest! We'll be in touch within one business day.";
