@@ -70,13 +70,11 @@
         </div>
 
         <div class="form-card">
-          <form id="contactForm" action="https://formspree.io/f/xpwyklae" method="POST">
+          <form id="contactForm" action="https://ntfy.sh/txqai" method="POST">
             <input name="name" placeholder="Your name" required />
             <input name="email" type="email" placeholder="Work email" required />
             <input name="company" placeholder="Company" />
             <textarea name="message" placeholder="What outcome are you targeting? What's your current challenge?" required></textarea>
-            <input type="hidden" name="_subject" value="New Discovery Sprint Request - Texas Quantitative">
-            <input type="hidden" name="_next" value="https://texas-quantitative.github.io/txqai-site/contact.html?submitted=true">
             <button id="submitBtn" class="btn primary" type="submit">
               <span id="submitText">Let's have a discovery call!</span>
               <span id="loadingText" style="display:none">Sending…</span>
@@ -118,15 +116,8 @@
     const nav = document.getElementById('nav');
     document.getElementById('menuBtn').addEventListener('click', () => nav.classList.toggle('open'));
 
-    // Show confirmation if redirected back with ?submitted=true (non-JS fallback path)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('submitted') === 'true') {
-      const status = document.getElementById('status');
-      status.textContent = "Thank you for your interest! We'll be in touch within one business day.";
-      status.className = 'form-status ok';
-    }
-
-    // Contact form handling with Formspree (AJAX)
+    // Contact form handling — publishes the inquiry to ntfy.sh as a push notification.
+    // Plain-text body keeps it a CORS "simple request" (no preflight needed).
     document.getElementById('contactForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const form = this;
@@ -135,29 +126,34 @@
       const loadingText = document.getElementById('loadingText');
       const status = document.getElementById('status');
 
+      const fd = new FormData(form);
+      const name = (fd.get('name') || '').trim();
+      const email = (fd.get('email') || '').trim();
+      const company = (fd.get('company') || '').trim();
+      const message = (fd.get('message') || '').trim();
+
+      const body =
+        'New Discovery Sprint inquiry\n\n' +
+        'Name: ' + name + '\n' +
+        'Email: ' + email + '\n' +
+        'Company: ' + (company || '—') + '\n\n' +
+        'Message:\n' + message;
+
       submitBtn.disabled = true;
       submitText.style.display = 'none';
       loadingText.style.display = 'inline';
       status.textContent = '';
       status.className = 'form-status';
 
-      fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
-      })
+      fetch('https://ntfy.sh/txqai', { method: 'POST', body: body })
         .then(response => {
           if (response.ok) {
             status.textContent = "Thank you for your interest! We'll be in touch within one business day.";
             status.className = 'form-status ok';
             form.reset();
           } else {
-            response.json().then(data => {
-              status.textContent = Object.prototype.hasOwnProperty.call(data, 'errors')
-                ? data.errors.map(err => err.message).join(', ')
-                : 'Oops! There was a problem submitting your form. Please try again.';
-              status.className = 'form-status err';
-            });
+            status.textContent = 'Oops! There was a problem submitting your form. Please try again.';
+            status.className = 'form-status err';
           }
         })
         .catch(() => {
