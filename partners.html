@@ -3,13 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contact — Texas Quantitative</title>
-  <meta name="description" content="Start a two-week Discovery Sprint. Tell us about your team and goals — we reply within one business day.">
+  <title>Referral Partners — Texas Quantitative</title>
+  <meta name="description" content="Introduce us to companies that should own their AI. We build the relationship — and you share in the outcome.">
   <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/site.css">
+  <style>
+    /* page-local: vertical checkboxes + fine print under the form */
+    .check-group { display: flex; flex-direction: column; gap: 8px; padding: 4px 2px 2px; }
+    .check-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .check-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .check-row label {
+      display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      font-size: 0.92rem; color: var(--text-secondary);
+      background: var(--bg-base); border: 1px solid var(--bg-border); border-radius: var(--radius-md);
+      padding: 9px 13px; transition: border-color .2s ease, color .2s ease;
+    }
+    .check-row label:hover { border-color: var(--accent-primary); color: var(--text-primary); }
+    .check-row input[type="checkbox"] { width: auto; accent-color: var(--accent-primary); margin: 0; }
+    .fineprint { margin-top: 14px; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted); }
+    .fineprint a { color: var(--text-secondary); }
+    .fineprint a:hover { color: var(--accent-primary); }
+  </style>
 </head>
 <body>
 
@@ -21,7 +38,7 @@
       <a class="navlink" href="./work.html">Work</a>
       <a class="navlink" href="./approach.html">Approach</a>
       <a class="navlink" href="./about.html">About</a>
-      <a class="cta" href="./contact.html" aria-current="page">Discovery Sprint</a>
+      <a class="cta" href="./contact.html">Discovery Sprint</a>
       <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
@@ -31,62 +48,80 @@
   <!-- hero -->
   <header class="hero center">
     <div class="wrap">
-      <div class="eyebrow">Contact · Discovery Sprint</div>
-      <h1>Start a <em>Discovery Sprint.</em></h1>
-      <p class="sub">Tell us about your team and goals. We'll reply within one business day to schedule your two-week discovery sprint.</p>
+      <div class="eyebrow">Referral Partners · By Application</div>
+      <h1>Open doors. <em>Share in the outcome.</em></h1>
+      <p class="sub">We work with a small number of referral partners who know their industries. You make the introduction, we build the relationship — and you're paid as we're paid.</p>
     </div>
   </header>
 
-  <!-- info + form -->
+  <!-- how it works + application form -->
   <section class="section">
     <div class="wrap">
       <div class="contact-grid">
 
         <div class="expect">
-          <h3>What to expect</h3>
+          <h3>How it works</h3>
           <div class="steplist">
             <div class="item">
               <span class="n">1</span>
               <div>
-                <h4>Discovery Call</h4>
-                <p>Initial 30-minute conversation about your goals and current state.</p>
+                <h4>You introduce</h4>
+                <p>You connect us with a company that should own its AI. We confirm in writing that the referral is new to us and accepted.</p>
               </div>
             </div>
             <div class="item">
               <span class="n">2</span>
               <div>
-                <h4>Sprint Planning</h4>
-                <p>Map data sources, workflows, and success metrics.</p>
+                <h4>We close</h4>
+                <p>Texas Quantitative runs the conversation, the discovery sprint, and the engagement. Your name stays attached the whole way.</p>
               </div>
             </div>
             <div class="item">
               <span class="n">3</span>
               <div>
-                <h4>MVP Roadmap</h4>
-                <p>Deliverable roadmap with technical architecture and timeline.</p>
+                <h4>You share in the outcome</h4>
+                <p>A share of first-year revenue from the client you introduced — paid as we're paid, from client revenue only, never from recruiting.</p>
               </div>
             </div>
+          </div>
+
+          <h3 style="margin-top:36px">Who we look for</h3>
+          <div class="bullets">
+            <div class="row"><span class="dot"></span><p>An established professional presence — your introduction opens the door on its own.</p></div>
+            <div class="row"><span class="dot"></span><p>A real network in finance, energy, or professional services — the rooms where data can't leave the building.</p></div>
+            <div class="row"><span class="dot"></span><p>Judgment about fit. One good introduction is worth more to us than twenty names.</p></div>
           </div>
         </div>
 
         <div class="form-card">
-          <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
-            <!-- Web3Forms access key — replace with the key emailed to you from web3forms.com -->
+          <form id="partnerForm" action="https://api.web3forms.com/submit" method="POST">
             <input type="hidden" name="access_key" value="58223ce1-e069-4226-9374-f3d2ee020bb7">
-            <input type="hidden" name="subject" value="New Discovery Sprint Request - Texas Quantitative">
+            <input type="hidden" name="subject" value="New Partner Application - Texas Quantitative">
             <input type="hidden" name="from_name" value="Texas Quantitative Website">
             <input name="name" placeholder="Your name" required />
-            <input name="email" type="email" placeholder="Work email" required />
-            <input name="company" placeholder="Company" />
-            <textarea name="message" placeholder="What outcome are you targeting? What's your current challenge?" required></textarea>
+            <input name="email" type="email" placeholder="Email" required />
+            <input name="linkedin" type="url" placeholder="LinkedIn profile URL" required />
+            <input name="company_role" placeholder="Company &amp; current role" />
+            <input name="city" placeholder="City" />
+            <div class="check-group">
+              <span class="check-label">Where your network runs</span>
+              <div class="check-row">
+                <label><input type="checkbox" name="network_verticals" value="Finance"> Finance</label>
+                <label><input type="checkbox" name="network_verticals" value="Energy"> Energy</label>
+                <label><input type="checkbox" name="network_verticals" value="Professional Services"> Professional services</label>
+                <label><input type="checkbox" name="network_verticals" value="Other"> Other</label>
+              </div>
+            </div>
+            <textarea name="message" placeholder="Tell us about your network — and why an introduction from you opens doors." required></textarea>
             <!-- honeypot: bots fill this, humans never see it -->
             <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
             <button id="submitBtn" class="btn primary" type="submit">
-              <span id="submitText">Let's have a discovery call!</span>
+              <span id="submitText">Apply to partner with us</span>
               <span id="loadingText" style="display:none">Sending…</span>
             </button>
           </form>
           <p id="status" class="form-status"></p>
+          <p class="fineprint">By applying, you agree that we review your application together with publicly available professional information, such as your LinkedIn profile. See our <a href="./privacy.html">Privacy Policy</a>.</p>
         </div>
 
       </div>
@@ -123,9 +158,9 @@
     const nav = document.getElementById('nav');
     document.getElementById('menuBtn').addEventListener('click', () => nav.classList.toggle('open'));
 
-    // Contact form handling with Web3Forms (AJAX). Submissions are emailed to the
-    // address tied to the access_key; a honeypot field filters bots.
-    document.getElementById('contactForm').addEventListener('submit', function (e) {
+    // Partner application form via Web3Forms (AJAX), same pipeline as the contact
+    // page — the subject line routes these as partner applications.
+    document.getElementById('partnerForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const form = this;
       const submitBtn = document.getElementById('submitBtn');
@@ -148,7 +183,7 @@
         .then(({ ok, data }) => {
           if (ok && data.success) {
             form.reset();
-            status.textContent = "Thank you for your interest! We'll be in touch within one business day.";
+            status.textContent = "Application received. We review every application and reply either way.";
             status.className = 'form-status ok';
           } else {
             status.textContent = (data && data.message) || 'Oops! There was a problem submitting your form. Please try again.';
