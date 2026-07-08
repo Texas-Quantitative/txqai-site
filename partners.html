@@ -94,10 +94,7 @@
         </div>
 
         <div class="form-card">
-          <form id="partnerForm" action="https://api.web3forms.com/submit" method="POST">
-            <input type="hidden" name="access_key" value="58223ce1-e069-4226-9374-f3d2ee020bb7">
-            <input type="hidden" name="subject" value="New Partner Application - Texas Quantitative">
-            <input type="hidden" name="from_name" value="Texas Quantitative Website">
+          <form id="partnerForm" action="https://tq-partner-intake.shopper817-912.workers.dev" method="POST">
             <input name="name" placeholder="Your name" required />
             <input name="email" type="email" placeholder="Email" required />
             <input name="linkedin" type="url" placeholder="LinkedIn profile URL" required />
@@ -158,8 +155,8 @@
     const nav = document.getElementById('nav');
     document.getElementById('menuBtn').addEventListener('click', () => nav.classList.toggle('open'));
 
-    // Partner application form via Web3Forms (AJAX), same pipeline as the contact
-    // page — the subject line routes these as partner applications.
+    // Partner application form posts to TQ's intake Worker, which notifies us
+    // and feeds the review pipeline. The contact page still uses Web3Forms.
     document.getElementById('partnerForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const form = this;
