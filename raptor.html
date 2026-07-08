@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texas Quantitative — Raptor</title>
+<meta name="description" content="Raptor: an agentic development harness. A crew of agents runs your software task on local models, escalating to the frontier only when policy allows.">
+<link rel="icon" href="favicon.ico">
+<style>
+  :root{
+    --void:#0b0d0c;
+    --rack:#13100c;
+    --rack-2:#1a1610;
+    --line:#2c2519;
+    --line-hot:#473a1f;
+    --phos:#f0b03c;        /* amber phosphor — the house color */
+    --phos-dim:#9a7124;
+    --phos-ghost:#5a4418;
+    --paper:#e9e2d0;
+    --paper-dim:#9c9684;
+    --idle:#4a4334;
+    --escalate:#6fb1ff;    /* the ONE second color: frontier escalation */
+    --escalate-dim:#2f5a8f;
+    --fail:#d7593b;
+    --ok:#7bc47f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--void);
+    color:var(--paper);
+    font-family:ui-monospace,"JetBrains Mono","SF Mono","Roboto Mono",Menlo,monospace;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    background-image:
+      repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(240,176,60,0.012) 3px,rgba(240,176,60,0.012) 4px);
+  }
+  .serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;}
+
+  /* ---- top bar ---- */
+  .bar{
+    position:sticky;top:0;z-index:60;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 26px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(to bottom,rgba(11,13,12,0.97),rgba(11,13,12,0.86));
+    backdrop-filter:blur(6px);
+    font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+  }
+  .bar .brand{color:var(--phos);font-weight:600;}
+  .bar .cross{color:var(--paper-dim);text-decoration:none;transition:color .3s ease;}
+  .bar .cross:hover{color:var(--phos);}
+  .bar .status{color:var(--paper-dim);display:flex;gap:18px;align-items:center;}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);
+    box-shadow:0 0 8px var(--ok);animation:blink 2s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* ---- hero ---- */
+  .hero{padding:64px 26px 30px;max-width:1180px;margin:0 auto;}
+  .eyebrow{font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--phos);}
+  h1.title{
+    font-family:"Iowan Old Style",Palatino,Georgia,serif;
+    font-weight:400;font-size:clamp(2.1rem,5.2vw,3.8rem);line-height:1.04;
+    letter-spacing:-0.01em;margin-top:14px;max-width:18ch;
+  }
+  h1.title em{font-style:italic;color:var(--phos);}
+  .hero .sub{margin-top:18px;max-width:62ch;font-size:0.98rem;line-height:1.6;color:var(--paper-dim);}
+
+  /* ---- console frame ---- */
+  .console{
+    max-width:1180px;margin:26px auto 0;padding:0 26px;
+  }
+  .frame{
+    border:1px solid var(--line-hot);
+    background:
+      radial-gradient(120% 100% at 50% 0%,rgba(240,176,60,0.04),transparent 60%),
+      var(--rack);
+    box-shadow:0 0 0 1px rgba(0,0,0,0.4),0 30px 80px -40px rgba(0,0,0,0.9);
+  }
+  .frame-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 16px;border-bottom:1px solid var(--line);
+    font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--paper-dim);
+  }
+  .frame-head .tag{color:var(--phos-dim);}
+
+  /* ---- pipeline stage ---- */
+  .stage{
+    position:relative;
+    padding:26px 18px 18px;
+  }
+  svg.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .nodes{
+    position:relative;z-index:2;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:14px;
+    align-items:stretch;
+  }
+  .node{
+    border:1px solid var(--line-hot);
+    background:var(--rack-2);
+    padding:13px 13px 12px;
+    cursor:pointer;
+    transition:border-color .25s,background .25s,box-shadow .25s,transform .15s;
+    position:relative;
+    min-height:104px;
+    display:flex;flex-direction:column;
+  }
+  .node:hover{transform:translateY(-2px);border-color:var(--phos-dim);}
+  .node:focus-visible{outline:2px solid var(--phos);outline-offset:2px;}
+  .node .role{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);}
+  .node .name{margin-top:6px;font-size:0.92rem;color:var(--paper);letter-spacing:0.02em;}
+  .node .tier{margin-top:auto;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--phos-ghost);}
+  .node .pip{
+    position:absolute;top:11px;right:11px;width:8px;height:8px;border-radius:50%;
+    background:var(--idle);transition:background .2s,box-shadow .2s;
+  }
+  /* active state pushed via JS class */
+  .node.active{border-color:var(--phos);background:linear-gradient(180deg,rgba(240,176,60,0.10),rgba(240,176,60,0.02));box-shadow:0 0 24px -6px var(--phos);}
+  .node.active .pip{background:var(--phos);box-shadow:0 0 12px var(--phos);}
+  .node.done .pip{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+  .node.fail{border-color:var(--fail);}
+  .node.fail .pip{background:var(--fail);box-shadow:0 0 12px var(--fail);}
+  /* escalation node uses the blue accent when hot */
+  .node.escalate.active{border-color:var(--escalate);background:linear-gradient(180deg,rgba(111,177,255,0.12),rgba(111,177,255,0.02));box-shadow:0 0 26px -6px var(--escalate);}
+  .node.escalate.active .pip{background:var(--escalate);box-shadow:0 0 12px var(--escalate);}
+  .node.escalate.active .tier{color:var(--escalate);}
+
+  /* ---- control + readout row ---- */
+  .controls{
+    display:grid;grid-template-columns:1.3fr 1fr;gap:14px;
+    padding:16px 18px 20px;border-top:1px solid var(--line);
+  }
+  @media(max-width:760px){.controls{grid-template-columns:1fr;}}
+
+  .jobbox label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--paper-dim);}
+  .jobrow{display:flex;gap:8px;margin-top:8px;}
+  .jobrow input{
+    flex:1;background:var(--void);border:1px solid var(--line-hot);color:var(--paper);
+    font-family:inherit;font-size:0.9rem;padding:11px 12px;letter-spacing:0.01em;
+  }
+  .jobrow input::placeholder{color:var(--idle);}
+  .jobrow input:focus{outline:none;border-color:var(--phos);}
+  .jobrow button{
+    background:var(--phos);color:#1a1305;border:none;font-family:inherit;font-weight:600;
+    font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;padding:0 18px;cursor:pointer;
+    transition:filter .2s;white-space:nowrap;
+  }
+  .jobrow button:hover{filter:brightness(1.12);}
+  .jobrow button:disabled{opacity:.4;cursor:not-allowed;}
+  .examples{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{
+    font-size:10px;letter-spacing:0.04em;color:var(--phos-dim);
+    border:1px solid var(--line-hot);padding:5px 9px;cursor:pointer;background:transparent;
+    font-family:inherit;transition:color .2s,border-color .2s;
+  }
+  .chip:hover{color:var(--phos);border-color:var(--phos-dim);}
+
+  /* observability rail */
+  .rail{border:1px solid var(--line);background:var(--void);display:flex;flex-direction:column;min-height:150px;}
+  .rail-head{
+    display:flex;justify-content:space-between;padding:8px 11px;border-bottom:1px solid var(--line);
+    font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--phos-dim);
+  }
+  .log{flex:1;overflow:hidden;padding:9px 11px;font-size:11.5px;line-height:1.7;}
+  .log .ln{opacity:0;animation:fadein .25s forwards;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  @keyframes fadein{to{opacity:1}}
+  .log .t{color:var(--phos-ghost);}
+  .log .m{color:var(--paper-dim);}
+  .log .m.ok{color:var(--ok);}
+  .log .m.esc{color:var(--escalate);}
+  .log .m.fail{color:var(--fail);}
+  .log .m.phos{color:var(--phos);}
+
+  /* detail drawer */
+  .drawer{
+    max-width:1180px;margin:14px auto 0;padding:0 26px;
+  }
+  .drawer-inner{
+    border:1px solid var(--line);border-left:2px solid var(--phos);
+    background:var(--rack);padding:16px 18px;
+    display:none;
+  }
+  .drawer-inner.show{display:block;}
+  .drawer-inner h4{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--phos);}
+  .drawer-inner .d-name{font-family:"Iowan Old Style",Palatino,serif;font-size:1.3rem;margin:6px 0 8px;color:var(--paper);}
+  .drawer-inner p{font-size:0.92rem;line-height:1.6;color:var(--paper-dim);max-width:70ch;}
+  .drawer-inner .meta{margin-top:12px;display:flex;gap:22px;flex-wrap:wrap;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--phos-ghost);}
+  .drawer-inner .meta b{color:var(--paper-dim);font-weight:400;}
+
+  /* ---- prose sections ---- */
+  section.copy{max-width:1180px;margin:0 auto;padding:96px 26px;border-top:1px solid var(--line);}
+  section.copy:first-of-type{margin-top:64px;}
+  .copy .eyebrow{color:var(--phos);}
+  .copy h2{font-family:"Iowan Old Style",Palatino,serif;font-weight:400;font-size:clamp(1.7rem,3.6vw,2.7rem);line-height:1.1;margin-top:12px;max-width:22ch;}
+  .copy .lede{margin-top:20px;max-width:64ch;font-size:1.02rem;line-height:1.65;color:var(--paper-dim);font-family:"Iowan Old Style",Palatino,serif;}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:42px;background:var(--line);border:1px solid var(--line);}
+  @media(max-width:680px){.two{grid-template-columns:1fr;}}
+  .cell{background:var(--rack);padding:24px 22px;}
+  .cell .k{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--phos);}
+  .cell h3{font-family:"Iowan Old Style",Palatino,serif;font-weight:400;font-size:1.25rem;margin:10px 0 8px;}
+  .cell p{font-size:0.92rem;line-height:1.55;color:var(--paper-dim);}
+
+  footer{border-top:1px solid var(--line);padding:34px 26px;text-align:center;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--idle);}
+  footer .p{color:var(--phos-dim);}
+
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;}html{scroll-behavior:auto;}}
+  @media(max-width:760px){
+    .nodes{grid-template-columns:repeat(2,1fr);}
+    svg.wires{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="brand">Raptor · Texas Quantitative</span>
+  <a class="cross" href="./splash.html">⟵ The Box on the Desk</a>
+  <span class="status"><span id="barState">PIPELINE IDLE</span> <span class="dot"></span></span>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">Agentic development harness</div>
+  <h1 class="title">Watch the agents <em>do the work.</em></h1>
+  <p class="sub">Raptor runs a software task through a crew of agents — a planner, workers, a reviewer, a QA gate. Most of it stays on local models. When a task is too hard, or too sensitive to send anywhere, the Escalation Boundary decides what happens next. Submit a job below and watch it route.</p>
+</div>
+
+<div class="console">
+  <div class="frame">
+    <div class="frame-head">
+      <span>raptor — live pipeline</span>
+      <span class="tag" id="cycleTag">cycle 0 · awaiting job</span>
+    </div>
+
+    <div class="stage">
+      <svg class="wires" id="wires" preserveAspectRatio="none"></svg>
+      <div class="nodes" id="nodes"></div>
+    </div>
+
+    <div class="controls">
+      <div class="jobbox">
+        <label for="jobInput">Submit a feature request</label>
+        <div class="jobrow">
+          <input id="jobInput" type="text" autocomplete="off"
+            placeholder="e.g. add rate limiting to the auth endpoint" />
+          <button id="runBtn">Run job</button>
+        </div>
+        <div class="examples" id="chips"></div>
+      </div>
+
+      <div class="rail">
+        <div class="rail-head"><span>STATUS.md</span><span id="railClock">--:--:--</span></div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="drawer">
+  <div class="drawer-inner" id="drawer">
+    <h4 id="dRole"></h4>
+    <div class="d-name" id="dName"></div>
+    <p id="dBody"></p>
+    <div class="meta" id="dMeta"></div>
+  </div>
+</div>
+
+<section class="copy">
+  <div class="eyebrow">The boundary</div>
+  <h2>The interesting decision is where to send the hard part.</h2>
+  <p class="lede">Local models are fast, private, and cheap, and they handle most of the work. But some tasks need a frontier model's reasoning — and some specifications are too sensitive to leave the building at all. Raptor's Escalation Boundary is the component that holds both truths at once: it routes by difficulty and by classification, so a sensitive task never escalates off-site even when a harder one would. On an air-gapped deployment, the boundary's answer to "escalate?" is simply always no, and the pipeline is built to finish anyway.</p>
+
+  <div class="two">
+    <div class="cell">
+      <div class="k">Local tier</div>
+      <h3>Runs on the box</h3>
+      <p>Planning, routine implementation, review, and QA run on local models — 70B-class on the client's own hardware. Nothing leaves.</p>
+    </div>
+    <div class="cell">
+      <div class="k">Frontier tier</div>
+      <h3>Escalates only when allowed</h3>
+      <p>Hard reasoning can escalate to a frontier model — but only for tasks the classification policy permits. Sensitive specs never qualify.</p>
+    </div>
+  </div>
+</section>
+
+<section class="copy">
+  <div class="eyebrow">Observability</div>
+  <h2>If you can't see what the agents did, you can't trust it.</h2>
+  <p class="lede">Every job writes to a STATUS.md the way a human team writes to a standup — who picked up what, what passed review, what bounced off QA, where a task escalated and why. The rail on the console is that file, updating as work moves. Raptor is built to be watched, not just run.</p>
+</section>
+
+<footer>
+  Texas Quantitative · <span class="p">txqai.com</span> · Raptor agentic harness · on-premises &amp; air-gapped
+</footer>
+
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- pipeline definition ----
+  const NODES = [
+    { id:'pm',   role:'Planner',  name:'PM Runner',   tier:'Local · Opus-class plan',
+      body:'Reads the request, breaks it into tasks, and assigns them to workers. Owns the plan and the definition of done. Decides nothing about implementation — only what needs doing and in what order.',
+      meta:[['Tier','Local'],['Model','PM / Opus-class'],['Owns','The plan']] },
+    { id:'wk',   role:'Workers',  name:'Worker Runner', tier:'Local · Sonnet-class',
+      body:'Picks up assigned tasks and writes the code. Runs in parallel where tasks are independent. Most work begins and ends here without ever touching a frontier model.',
+      meta:[['Tier','Local'],['Model','Worker / Sonnet-class'],['Mode','Parallel']] },
+    { id:'esc',  role:'Boundary', name:'Escalation Boundary', tier:'Routes local ↔ frontier',
+      body:'The judgment call. For each task it weighs two things: is this hard enough to need a frontier model, and is it sensitive enough that it must not leave the building? Difficulty can escalate; classification can veto. On air-gapped deployments it never escalates, and the pipeline completes locally anyway.',
+      meta:[['Decides','Escalate?'],['By','Difficulty + classification'],['Air-gapped','Never escalates']] },
+    { id:'crev', role:'Reviewer', name:'crev',         tier:'Local · review pass',
+      body:'A CLI code reviewer with language packs. Reads the diff the workers produced and flags correctness, security, and style issues before anything reaches QA. Catches the obvious so QA can catch the subtle.',
+      meta:[['Tier','Local'],['Form','CLI reviewer'],['Packs','Multi-language']] },
+    { id:'qa',   role:'Gate',     name:'QA Integration', tier:'Local · pass / bounce',
+      body:'The gate. Runs the change against tests and integration checks. A pass moves the task to done; a failure bounces it back to the workers with notes. Nothing ships from a bounce.',
+      meta:[['Tier','Local'],['Result','Pass or bounce'],['On fail','Back to workers']] },
+  ];
+
+  const CHIPS = [
+    'add rate limiting to the auth endpoint',
+    'refactor the billing module for idempotency',
+    'classified: ingest sensor telemetry schema',
+    'fix the flaky checkout integration test',
+  ];
+
+  // ---- build node DOM ----
+  const nodesEl = document.getElementById('nodes');
+  const nodeMap = {};
+  NODES.forEach(n=>{
+    const el = document.createElement('div');
+    el.className = 'node' + (n.id==='esc'?' escalate':'');
+    el.tabIndex = 0;
+    el.setAttribute('role','button');
+    el.setAttribute('aria-label', n.name + ' — ' + n.role);
+    el.innerHTML = `<span class="pip"></span>
+      <span class="role">${n.role}</span>
+      <span class="name">${n.name}</span>
+      <span class="tier">${n.tier}</span>`;
+    el.addEventListener('click',()=>openDrawer(n));
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDrawer(n);}});
+    nodesEl.appendChild(el);
+    nodeMap[n.id]=el;
+  });
+
+  // ---- chips ----
+  const chipsEl = document.getElementById('chips');
+  CHIPS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='chip';b.textContent=c;
+    b.addEventListener('click',()=>{document.getElementById('jobInput').value=c;runJob();});
+    chipsEl.appendChild(b);
+  });
+
+  // ---- wires (SVG connectors between node centers) ----
+  const wires = document.getElementById('wires');
+  function drawWires(){
+    const stage = wires.parentElement.getBoundingClientRect();
+    wires.setAttribute('viewBox',`0 0 ${stage.width} ${stage.height}`);
+    wires.innerHTML='';
+    const order=['pm','wk','esc','crev','qa'];
+    for(let i=0;i<order.length-1;i++){
+      const a=nodeMap[order[i]].getBoundingClientRect();
+      const b=nodeMap[order[i+1]].getBoundingClientRect();
+      const x1=a.right-stage.left, y1=a.top-stage.top+a.height/2;
+      const x2=b.left-stage.left,  y2=b.top-stage.top+b.height/2;
+      const mid=(x1+x2)/2;
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d',`M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`);
+      p.setAttribute('fill','none');
+      p.setAttribute('stroke','var(--line-hot)');
+      p.setAttribute('stroke-width','1.5');
+      p.id='wire-'+i;
+      wires.appendChild(p);
+    }
+  }
+
+  // ---- observability log ----
+  const logEl=document.getElementById('log');
+  const clockEl=document.getElementById('railClock');
+  function now(){return new Date().toLocaleTimeString('en-US',{hour12:false});}
+  function log(msg,cls){
+    const ln=document.createElement('div');
+    ln.className='ln';
+    ln.innerHTML=`<span class="t">${now()}</span> <span class="m ${cls||''}">${msg}</span>`;
+    logEl.appendChild(ln);
+    while(logEl.children.length>7) logEl.removeChild(logEl.firstChild);
+  }
+
+  // ---- drawer ----
+  const drawer=document.getElementById('drawer');
+  function openDrawer(n){
+    document.getElementById('dRole').textContent=n.role;
+    document.getElementById('dName').textContent=n.name;
+    document.getElementById('dBody').textContent=n.body;
+    const m=document.getElementById('dMeta');
+    m.innerHTML=n.meta.map(([k,v])=>`<span>${k} · <b>${v}</b></span>`).join('');
+    drawer.classList.add('show');
+    drawer.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
+  }
+
+  // ---- job runner (scripted, deterministic-ish) ----
+  const barState=document.getElementById('barState');
+  const cycleTag=document.getElementById('cycleTag');
+  let cycle=0, running=false;
+  const runBtn=document.getElementById('runBtn');
+  const input=document.getElementById('jobInput');
+
+  function clearStates(){Object.values(nodeMap).forEach(el=>el.classList.remove('active','done','fail'));}
+  function setActive(id){nodeMap[id].classList.add('active');}
+  function setDone(id){nodeMap[id].classList.remove('active');nodeMap[id].classList.add('done');}
+
+  const wait=ms=>new Promise(r=>setTimeout(r,reduce?Math.min(ms,120):ms));
+
+  async function runJob(){
+    if(running) return;
+    const job=(input.value||'add rate limiting to the auth endpoint').trim();
+    const sensitive=/class\w*|secret|clearance|itar|cui|telemetry|sensor|weapon/i.test(job);
+    const hard=/refactor|idempotenc|distributed|concurren|migrat|architect/i.test(job) && !sensitive;
+
+    running=true;runBtn.disabled=true;clearStates();logEl.innerHTML='';
+    cycle++;cycleTag.textContent=`cycle ${cycle} · running`;
+    barState.textContent='PIPELINE RUNNING';
+
+    // PM
+    setActive('pm');
+    log(`PM Runner: received "${job.length>38?job.slice(0,38)+'…':job}"`,'phos');
+    await wait(700);
+    log('PM Runner: decomposed into 3 tasks, assigned to workers');
+    setDone('pm');
+
+    // Workers
+    setActive('wk');
+    await wait(550);
+    log('Worker Runner: 3 workers picked up tasks (parallel)');
+    await wait(750);
+    log('Worker Runner: drafts ready · 2 trivial, 1 flagged complex');
+    setDone('wk');
+
+    // Escalation boundary
+    setActive('esc');
+    await wait(500);
+    if(sensitive){
+      log('Boundary: task classified SENSITIVE — escalation vetoed','esc');
+      await wait(650);
+      log('Boundary: completing on local tier, nothing leaves the box','ok');
+    } else if(hard){
+      log('Boundary: complex task — difficulty exceeds local threshold','esc');
+      await wait(650);
+      log('Boundary: escalating 1 task to frontier tier','esc');
+    } else {
+      log('Boundary: all tasks within local threshold — no escalation');
+      await wait(550);
+    }
+    setDone('esc');
+
+    // crev
+    setActive('crev');
+    await wait(600);
+    log('crev: reviewing diff · 0 security, 1 style note');
+    setDone('crev');
+
+    // QA — sometimes bounces
+    setActive('qa');
+    await wait(650);
+    const bounce = Math.random()<0.34 && !reduce;
+    if(bounce){
+      nodeMap['qa'].classList.remove('active');
+      nodeMap['qa'].classList.add('fail');
+      log('QA Integration: 1 test failed — bouncing task to workers','fail');
+      await wait(800);
+      nodeMap['qa'].classList.remove('fail');
+      // rework loop
+      setActive('wk'); nodeMap['wk'].classList.remove('done');
+      log('Worker Runner: reworking bounced task');
+      await wait(700);
+      setDone('wk');
+      setActive('qa');
+      log('QA Integration: re-running suite…');
+      await wait(750);
+    }
+    log('QA Integration: all checks passed','ok');
+    setDone('qa');
+
+    await wait(300);
+    cycleTag.textContent=`cycle ${cycle} · job complete`;
+    barState.textContent='PIPELINE IDLE';
+    log('STATUS.md: job complete · merged to main','phos');
+    running=false;runBtn.disabled=false;
+  }
+
+  runBtn.addEventListener('click',runJob);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')runJob();});
+
+  // clock
+  setInterval(()=>{clockEl.textContent=now();},1000);
+  clockEl.textContent=now();
+
+  // layout
+  function layout(){drawWires();}
+  window.addEventListener('resize',layout);
+  // initial wire draw after fonts/layout settle
+  requestAnimationFrame(()=>requestAnimationFrame(layout));
+  setTimeout(layout,300);
+})();
+</script>
+</body>
+</html>

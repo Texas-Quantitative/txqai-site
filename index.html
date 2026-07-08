@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texas Quantitative — Sovereign On-Premises AI</title>
+<meta name="description" content="Private AI you own outright. A sealed appliance that keeps your data in the building, and Raptor — an agentic harness that builds on it, escalating off-box only when you allow.">
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Design tokens — adopted from CoolScreen (UniFi-inspired)
+     ============================================================ */
+  :root {
+    --bg-base:        #080e18;
+    --bg-surface:     #0d1526;
+    --bg-elevated:    #111e35;
+    --bg-border:      #1a2d4a;
+
+    --accent-primary:   #00c8b4;   /* teal */
+    --accent-secondary: #0096ff;   /* electric blue */
+    --accent-warn:      #f5a623;   /* amber */
+    --accent-danger:    #e8394d;   /* red */
+    --accent-success:   #27c66f;   /* green */
+
+    --text-primary:   #e8f0fe;
+    --text-secondary: #7a9cc4;
+    --text-muted:     #3d5a80;
+    --text-accent:    var(--accent-primary);
+
+    --glow-teal:   0 0 12px rgba(0, 200, 180, 0.4);
+    --glow-blue:   0 0 12px rgba(0, 150, 255, 0.4);
+
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Menlo', monospace;
+    --font-ui:   'Inter', 'SF Pro Display', system-ui, sans-serif;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* radial atmosphere + grid wash */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(1100px 600px at 78% -8%, rgba(0,150,255,0.10), transparent 60%),
+      radial-gradient(900px 520px at 10% 4%, rgba(0,200,180,0.08), transparent 60%),
+      linear-gradient(180deg, transparent, rgba(8,14,24,0.4) 88%);
+  }
+
+  /* faint noise grain (from CoolScreen) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+  .mono { font-family: var(--font-mono); }
+
+  /* ---------- shared label/header bits used by inlined panels ---------- */
+  .panel-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .panel-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-accent); }
+  .panel-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-primary); box-shadow: var(--glow-teal); animation: pulse-dot 2s ease-in-out infinite; }
+  .label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .value { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+
+  /* ---------- nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--bg-border);
+    background: linear-gradient(to bottom, rgba(8,14,24,0.96), rgba(8,14,24,0.78));
+    backdrop-filter: blur(8px);
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .nav .brand { color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 9px; }
+  .nav .brand b { color: var(--accent-primary); font-weight: 600; }
+  .nav .spark { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-primary); box-shadow: var(--glow-teal); }
+  .nav .links { display: flex; gap: 22px; align-items: center; }
+  .nav .links a { color: var(--text-secondary); text-decoration: none; transition: color .25s ease; }
+  .nav .links a:hover { color: var(--accent-primary); }
+  .nav .links a.cta { color: var(--bg-base); background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 7px 14px; border-radius: var(--radius-sm); font-weight: 600; }
+  .nav .links a.cta:hover { color: var(--bg-base); opacity: 0.9; }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 96px 0 72px; position: relative; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-primary); margin-bottom: 20px; }
+  .hero h1 {
+    font-weight: 500; letter-spacing: -0.015em; line-height: 1.04;
+    font-size: clamp(2.3rem, 5.4vw, 4.4rem);
+    max-width: 18ch;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent-primary); }
+  .hero .sub { margin-top: 24px; max-width: 60ch; font-size: clamp(1rem, 1.4vw, 1.18rem); color: var(--text-secondary); }
+  .btn-row { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 14px; }
+  .btn {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; padding: 13px 22px; border-radius: var(--radius-sm);
+    border: 1px solid var(--bg-border); color: var(--text-primary); transition: all .25s ease;
+  }
+  .btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+  .btn.primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: var(--bg-base); border-color: transparent; font-weight: 600; }
+  .btn.primary:hover { opacity: 0.9; color: var(--bg-base); }
+
+  /* status ticker under hero */
+  .ticker {
+    margin-top: 52px; border-top: 1px solid var(--bg-border); border-bottom: 1px solid var(--bg-border);
+    padding: 12px 0; overflow: hidden; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--text-muted);
+  }
+  .ticker b { color: var(--accent-primary); font-weight: 500; }
+  .ticker .sep { color: var(--bg-border); margin: 0 14px; }
+
+  /* ---------- sections ---------- */
+  .section { padding: 92px 0; border-top: 1px solid var(--bg-border); position: relative; }
+  .sec-label { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-secondary); margin-bottom: 16px; }
+  .section h2 { font-weight: 500; letter-spacing: -0.01em; line-height: 1.1; font-size: clamp(1.8rem, 3.6vw, 2.9rem); max-width: 20ch; }
+  .section h2 em { font-style: normal; color: var(--accent-primary); }
+  .lede { margin-top: 20px; max-width: 56ch; color: var(--text-secondary); font-size: 1.06rem; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .split.reverse .col-console { order: -1; }
+
+  .sec-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 28px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-primary); text-decoration: none; transition: gap .25s ease; }
+  .sec-cta:hover { gap: 14px; }
+
+  /* product grid (The Box) */
+  .prods { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 34px; background: var(--bg-border); border: 1px solid var(--bg-border); border-radius: var(--radius-md); overflow: hidden; }
+  .prod { background: var(--bg-surface); padding: 22px 20px; transition: background .25s ease; }
+  .prod:hover { background: var(--bg-elevated); }
+  .prod .num { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; color: var(--accent-primary); }
+  .prod h3 { font-weight: 500; font-size: 1.12rem; margin: 10px 0 7px; }
+  .prod p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.5; }
+
+  /* tier cells (Raptor) */
+  .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 30px; }
+  .tier { background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: var(--radius-md); padding: 20px; position: relative; overflow: hidden; }
+  .tier::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent-secondary), transparent); opacity: 0.55; }
+  .tier.frontier::before { background: linear-gradient(90deg, transparent, var(--accent-warn), transparent); }
+  .tier .k { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .tier h4 { font-weight: 500; font-size: 1.05rem; margin: 9px 0 7px; }
+  .tier p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ---------- console frame (holds the live panels) ---------- */
+  .console { background: var(--bg-surface); border: 1px solid var(--bg-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+  .console-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-bottom: 1px solid var(--bg-border);
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-secondary);
+    background: rgba(17,30,53,0.5);
+  }
+  .console-head .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-success); box-shadow: 0 0 7px var(--accent-success); animation: pulse-dot 1.8s ease-in-out infinite; }
+  .console-head .tag { margin-left: auto; color: var(--text-muted); }
+  .console-body { height: clamp(360px, 44vh, 440px); position: relative; }
+  .console-body > .panel-root { height: 100%; }
+
+  /* ---------- creed ---------- */
+  .creed { padding: 78px 0; border-top: 1px solid var(--bg-border); }
+  .creed p { font-size: clamp(1.3rem, 3vw, 2.1rem); line-height: 1.32; max-width: 26ch; color: var(--text-primary); font-weight: 300; }
+  .creed .attrib { margin-top: 22px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-primary); }
+  .creed .attrib a { color: inherit; text-decoration: none; }
+  .creed .attrib a:hover { text-decoration: underline; }
+
+  /* ---------- footer ---------- */
+  footer { border-top: 1px solid var(--bg-border); padding: 38px 0; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center; justify-content: space-between; }
+  footer .fline { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  footer .fline b { color: var(--accent-primary); font-weight: 500; }
+  footer .fnav { display: flex; flex-wrap: wrap; gap: 18px; }
+  footer .fnav a { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); text-decoration: none; transition: color .25s ease; }
+  footer .fnav a:hover { color: var(--accent-primary); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px) {
+    .split { grid-template-columns: 1fr; gap: 28px; }
+    .split.reverse .col-console { order: 0; }
+    .nav .links a.navlink { display: none; }
+    .prods, .tiers { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ============================================================
+     Inlined panel: Inference Gauges  (from CoolScreen 01)
+     ============================================================ */
+  .gauges-layout { display: grid; grid-template-rows: auto 1fr auto; height: 100%; gap: 10px; padding: 16px 18px; }
+  .gauges-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; min-height: 0; }
+  .gauge-card { background: var(--bg-elevated); border: 1px solid var(--bg-border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 8px 10px; position: relative; overflow: hidden; min-height: 0; }
+  .gauge-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; }
+  .gauge-card.cpu::before    { background: linear-gradient(90deg, transparent, #00c8b4, transparent); }
+  .gauge-card.memory::before { background: linear-gradient(90deg, transparent, #0096ff, transparent); }
+  .gauge-card.gpu::before    { background: linear-gradient(90deg, transparent, #a855f7, transparent); }
+  .gauge-card.network::before{ background: linear-gradient(90deg, transparent, #f5a623, transparent); }
+  .gauge-card.cache::before  { background: linear-gradient(90deg, transparent, #27c66f, transparent); }
+  .gauge-card.temp::before   { background: linear-gradient(90deg, transparent, #e8394d, transparent); }
+  .gauge-wrap { position: relative; flex-shrink: 0; }
+  .gauge-wrap svg { display: block; transform: rotate(-90deg); }
+  .g-track { fill: none; stroke: rgba(255,255,255,0.06); }
+  .g-fill  { fill: none; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .gauge-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .gauge-pct { font-family: var(--font-mono); font-weight: 600; line-height: 1; color: var(--text-primary); }
+  .gauge-sub { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); line-height: 1; margin-top: 2px; }
+  .gauge-name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary); }
+  .gauge-spark { width: 80%; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; position: relative; }
+  .gauge-spark-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; transition: width 0.6s ease; }
+  .cpu     .gauge-spark-fill { background: linear-gradient(90deg, #00c8b4, #0096ff); }
+  .memory  .gauge-spark-fill { background: linear-gradient(90deg, #0096ff, #a855f7); }
+  .gpu     .gauge-spark-fill { background: linear-gradient(90deg, #a855f7, #e8394d); }
+  .network .gauge-spark-fill { background: linear-gradient(90deg, #f5a623, #27c66f); }
+  .cache   .gauge-spark-fill { background: linear-gradient(90deg, #27c66f, #00c8b4); }
+  .temp    .gauge-spark-fill { background: linear-gradient(90deg, #f5a623, #e8394d); }
+  .gauges-status { display: flex; align-items: center; gap: 16px; padding: 6px 2px 0; border-top: 1px solid var(--bg-border); flex-shrink: 0; }
+  .status-badge { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-success); box-shadow: 0 0 6px var(--accent-success); animation: pulse-dot 1.8s ease-in-out infinite; }
+
+  /* ============================================================
+     Inlined panel: Agentic Harness ×4  (from CoolScreen 05)
+     ============================================================ */
+  .ahq-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; height: 100%; padding: 10px; }
+  .ahq-cell { background: var(--bg-elevated); border: 1px solid var(--bg-border); border-radius: var(--radius-md); display: flex; flex-direction: column; padding: 8px 10px 6px; gap: 4px; min-height: 0; overflow: hidden; }
+  .ahq-header { display: flex; align-items: center; gap: 6px; flex-shrink: 0; height: 18px; }
+  .ahq-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-primary); box-shadow: 0 0 5px var(--accent-primary); flex-shrink: 0; }
+  .ahq-title { font-family: var(--font-mono); font-size: 9px; letter-spacing: .10em; text-transform: uppercase; color: var(--text-secondary); }
+  .ahq-active { margin-left: auto; font-family: var(--font-mono); font-size: 9px; color: var(--accent-primary); }
+  .ahq-canvas-wrap { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+  .ahq-cv { display: block; }
+  .ahq-log { flex-shrink: 0; height: 30px; overflow: hidden; font-family: var(--font-mono); font-size: 9px; line-height: 1.65; color: var(--text-muted); border-top: 1px solid var(--bg-border); padding-top: 3px; }
+  .ahq-log-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+
+<!-- ───────────────────────── nav ───────────────────────── -->
+<nav class="nav">
+  <span class="brand"><span class="spark"></span> Texas <b>Quantitative</b></span>
+  <span class="links">
+    <a class="navlink" href="#box">The Box</a>
+    <a class="navlink" href="#raptor">Raptor</a>
+    <a class="navlink" href="./work.html">Work</a>
+    <a class="navlink" href="./approach.html">Approach</a>
+    <a class="navlink" href="./about.html">About</a>
+    <a class="cta" href="./contact.html">Discovery Sprint</a>
+  </span>
+</nav>
+
+<!-- ───────────────────────── hero ───────────────────────── -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Sovereign On-Premises AI · Dallas–Fort Worth</div>
+    <h1>The intelligence runs where your data <em>already lives.</em></h1>
+    <p class="sub">Texas Quantitative builds private AI you own outright. A sealed appliance that keeps your data in the building — and <em>Raptor</em>, an agentic harness that does real software work on top of it, escalating off-box only when you say so.</p>
+    <div class="btn-row">
+      <a class="btn primary" href="#box">Explore the Box ↓</a>
+      <a class="btn" href="#raptor">See Raptor ↓</a>
+    </div>
+
+    <div class="ticker">
+      <span class="mono">
+        <b>STATUS</b> Sovereign mode <span class="sep">·</span>
+        Data egress <b>0 bytes</b> <span class="sep">·</span>
+        Inference <b>on-box</b> <span class="sep">·</span>
+        Escalation boundary <b>armed</b> <span class="sep">·</span>
+        Perimeter <b>sealed</b> <span class="sep">·</span>
+        Air-gap <b>ready</b>
+      </span>
+    </div>
+  </div>
+</header>
+
+<!-- ───────────────────── section 01 · THE BOX ───────────────────── -->
+<section class="section" id="box">
+  <div class="wrap">
+    <div class="split">
+      <div class="col-copy">
+        <div class="sec-label">01 / The Box on the Desk</div>
+        <h2>Your data never <em>leaves the building.</em></h2>
+        <p class="lede">We don't rent you a seat in someone else's cloud. We hand you the box, pre-imaged and sealed. You own it. The intelligence runs where the data already lives — and stays there. The appliance is sovereign, the perimeter seals, and the relationship — not the subscription — is what we actually sell.</p>
+
+        <div class="prods">
+          <div class="prod">
+            <div class="num mono">01 · RISK</div>
+            <h3>Risk Studio</h3>
+            <p>Graph-neural-network portfolio risk. Sees the exposures a correlation matrix hides.</p>
+          </div>
+          <div class="prod">
+            <div class="num mono">02 · DOCS</div>
+            <h3>True Insights</h3>
+            <p>Document intelligence that reads and reasons across your filings without shipping a page off-site.</p>
+          </div>
+          <div class="prod">
+            <div class="num mono">03 · BOOKS</div>
+            <h3>Mybiz</h3>
+            <p>An on-premises bookkeeping appliance. Headless, pre-imaged, and yours.</p>
+          </div>
+          <div class="prod">
+            <div class="num mono">04 · BUILD</div>
+            <h3>Raptor</h3>
+            <p>An agentic development harness that routes work locally and escalates only when allowed.</p>
+          </div>
+        </div>
+
+        <a class="sec-cta" href="./splash.html">Enter the box on the desk ⟶</a>
+      </div>
+
+      <div class="col-console">
+        <div class="console">
+          <div class="console-head">
+            <span class="dot"></span> Inference Engine · On-Box
+            <span class="tag">local · no egress</span>
+          </div>
+          <div class="console-body">
+            <!-- Inference Gauges panel -->
+            <div class="panel-root">
+              <div class="gauges-layout">
+                <div class="panel-header">
+                  <div class="panel-dot"></div>
+                  <span class="panel-title">Inference Engine</span>
+                  <span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)" id="g-clock"></span>
+                </div>
+                <div class="gauges-grid" id="gauges-grid">
+                  <div class="gauge-card cpu"     data-key="cpu"><div class="gauge-wrap" id="wrap-cpu"></div><div class="gauge-name">CPU</div><div class="gauge-spark"><div class="gauge-spark-fill" id="spark-cpu"></div></div></div>
+                  <div class="gauge-card memory"  data-key="memory"><div class="gauge-wrap" id="wrap-memory"></div><div class="gauge-name">Memory</div><div class="gauge-spark"><div class="gauge-spark-fill" id="spark-memory"></div></div></div>
+                  <div class="gauge-card gpu"     data-key="gpu"><div class="gauge-wrap" id="wrap-gpu"></div><div class="gauge-name">GPU</div><div class="gauge-spark"><div class="gauge-spark-fill" id="spark-gpu"></div></div></div>
+                  <div class="gauge-card network" data-key="network"><div class="gauge-wrap" id="wrap-network"></div><div class="gauge-name">Network</div><div class="gauge-spark"><div class="gauge-spark-fill" id="spark-network"></div></div></div>
+                  <div class="gauge-card cache"   data-key="cache"><div class="gauge-wrap" id="wrap-cache"></div><div class="gauge-name">Cache</div><div class="gauge-spark"><div class="gauge-spark-fill" id="spark-cache"></div></div></div>
+                  <div class="gauge-card temp"    data-key="temp"><div class="gauge-wrap" id="wrap-temp"></div><div class="gauge-name">Temp</div><div class="gauge-spark"><div class="gauge-spark-fill" id="spark-temp"></div></div></div>
+                </div>
+                <div class="gauges-status">
+                  <div class="status-badge"><div class="status-dot"></div><span>LLM · Running</span></div>
+                  <div class="status-badge" style="margin-left:auto"><span id="g-tokens">— tok/s</span></div>
+                  <div class="status-badge"><span id="g-clock2">—</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────────── section 02 · RAPTOR ───────────────────── -->
+<section class="section" id="raptor">
+  <div class="wrap">
+    <div class="split reverse">
+      <div class="col-console">
+        <div class="console">
+          <div class="console-head">
+            <span class="dot"></span> Live Pipeline · 4 Harnesses
+            <span class="tag">planner · workers · QA</span>
+          </div>
+          <div class="console-body">
+            <!-- Agentic Harness ×4 panel -->
+            <div class="panel-root">
+              <div class="ahq-grid">
+                <div class="ahq-cell" id="ahq-0"><div class="ahq-header"><div class="ahq-dot"></div><span class="ahq-title">Harness · Alpha</span><span class="ahq-active">0 active</span></div><div class="ahq-canvas-wrap"><canvas class="ahq-cv"></canvas></div><div class="ahq-log"></div></div>
+                <div class="ahq-cell" id="ahq-1"><div class="ahq-header"><div class="ahq-dot"></div><span class="ahq-title">Harness · Bravo</span><span class="ahq-active">0 active</span></div><div class="ahq-canvas-wrap"><canvas class="ahq-cv"></canvas></div><div class="ahq-log"></div></div>
+                <div class="ahq-cell" id="ahq-2"><div class="ahq-header"><div class="ahq-dot"></div><span class="ahq-title">Harness · Charlie</span><span class="ahq-active">0 active</span></div><div class="ahq-canvas-wrap"><canvas class="ahq-cv"></canvas></div><div class="ahq-log"></div></div>
+                <div class="ahq-cell" id="ahq-3"><div class="ahq-header"><div class="ahq-dot"></div><span class="ahq-title">Harness · Delta</span><span class="ahq-active">0 active</span></div><div class="ahq-canvas-wrap"><canvas class="ahq-cv"></canvas></div><div class="ahq-log"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-copy">
+        <div class="sec-label">02 / Raptor</div>
+        <h2>Watch the agents <em>do the work.</em></h2>
+        <p class="lede">Raptor runs a software task through a crew of agents — a planner, workers, a reviewer, a QA gate. Most of it stays on local models. When a task is too hard, or too sensitive to send anywhere, the Escalation Boundary decides what happens next: it routes by difficulty and by classification, so a sensitive task never escalates off-site even when a harder one would.</p>
+
+        <div class="tiers">
+          <div class="tier local">
+            <div class="k">Local tier</div>
+            <h4>Runs on the box</h4>
+            <p>Planning, implementation, review, and QA run on local models — on the client's own hardware. Nothing leaves.</p>
+          </div>
+          <div class="tier frontier">
+            <div class="k">Frontier tier</div>
+            <h4>Escalates only when allowed</h4>
+            <p>Hard reasoning can escalate to a frontier model — but only for tasks the classification policy permits.</p>
+          </div>
+        </div>
+
+        <a class="sec-cta" href="./raptor.html">Open the Raptor console ⟶</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── section 03 · REFERRAL PARTNERS ───────────────── -->
+<section class="section" id="partners" style="border-top:1px solid var(--bg-border)">
+  <div class="wrap">
+    <div class="sec-label">03 / Referral Partners</div>
+    <h2>Know someone who should <em>own their AI?</em></h2>
+    <p class="lede">We work with a small number of referral partners — people whose word opens doors in finance, energy, and professional services. You make the introduction, we build the relationship, and you share in the outcome.</p>
+    <a class="sec-cta" href="./partners.html">Become a referral partner ⟶</a>
+  </div>
+</section>
+
+<!-- ───────────────────────── creed ───────────────────────── -->
+<section class="creed">
+  <div class="wrap">
+    <p>Built into the house, not out of it. Strength honestly attributed. Outcomes held loosely.</p>
+    <div class="attrib"><a href="https://stackpole.net/" target="_blank" rel="noopener noreferrer">The Stackpole Builder's Canon</a></div>
+  </div>
+</section>
+
+<!-- ───────────────────────── footer ───────────────────────── -->
+<footer>
+  <div class="wrap">
+    <div class="fline">Texas Quantitative · <b>txqai.com</b> · Sovereign on-premises AI</div>
+    <nav class="fnav">
+      <a href="#box">The Box</a>
+      <a href="#raptor">Raptor</a>
+      <a href="./splash.html">Splash</a>
+      <a href="./work.html">Work</a>
+      <a href="./approach.html">Approach</a>
+      <a href="./about.html">About</a>
+      <a href="./partners.html">Partners</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ═══════════════ inlined panel script: Inference Gauges ═══════════════ -->
+<script>
+(function () {
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const STROKE = 7;
+
+  const GAUGES = [
+    { key: 'cpu',     color: '#00c8b4', sim: () => 62 + Math.sin(Date.now()/900)*14  + Math.random()*14, fmt: v => Math.round(v)+'%',  sub: v => Math.round(v*0.10)+' cores active' },
+    { key: 'memory',  color: '#0096ff', sim: () => 74 + Math.sin(Date.now()/5000)*6  + Math.random()*4,  fmt: v => Math.round(v)+'%',  sub: v => (v/100*128).toFixed(1)+' GB used' },
+    { key: 'gpu',     color: '#a855f7', sim: () => 84 + Math.sin(Date.now()/450)*7   + Math.random()*7,  fmt: v => Math.round(v)+'%',  sub: v => (v/100*80).toFixed(1)+' GB VRAM' },
+    { key: 'network', color: '#f5a623', sim: () => 35 + Math.sin(Date.now()/1100)*28 + Math.random()*14, fmt: v => Math.round(v)+'%',  sub: v => (v*12.5).toFixed(0)+' MB/s' },
+    { key: 'cache',   color: '#27c66f', sim: () => 89 + Math.sin(Date.now()/4000)*3  + Math.random()*4,  fmt: v => Math.round(v)+'%',  sub: () => 'hit rate' },
+    { key: 'temp',    color: '#e8394d', sim: () => 73 + Math.sin(Date.now()/7000)*5  + Math.random()*3,  fmt: v => Math.round(v)+'°C', sub: () => 'package' },
+  ];
+
+  function buildGauge(g, size) {
+    const wrap = document.getElementById('wrap-' + g.key);
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    wrap.style.width = size + 'px';
+    wrap.style.height = size + 'px';
+    const R = (size - STROKE) / 2, CX = size / 2, C = 2 * Math.PI * R;
+
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('width', size); svg.setAttribute('height', size);
+    svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const filt = document.createElementNS(SVG_NS, 'filter');
+    filt.setAttribute('id', 'glow-' + g.key);
+    const blur = document.createElementNS(SVG_NS, 'feGaussianBlur');
+    blur.setAttribute('stdDeviation', '3'); blur.setAttribute('result', 'coloredBlur');
+    const merge = document.createElementNS(SVG_NS, 'feMerge');
+    ['coloredBlur', 'SourceGraphic'].forEach(src => { const n = document.createElementNS(SVG_NS, 'feMergeNode'); n.setAttribute('in', src); merge.appendChild(n); });
+    filt.appendChild(blur); filt.appendChild(merge); defs.appendChild(filt); svg.appendChild(defs);
+
+    const track = document.createElementNS(SVG_NS, 'circle');
+    track.setAttribute('cx', CX); track.setAttribute('cy', CX); track.setAttribute('r', R);
+    track.setAttribute('class', 'g-track'); track.setAttribute('stroke-width', STROKE); svg.appendChild(track);
+
+    const fill = document.createElementNS(SVG_NS, 'circle');
+    fill.setAttribute('cx', CX); fill.setAttribute('cy', CX); fill.setAttribute('r', R);
+    fill.setAttribute('class', 'g-fill'); fill.setAttribute('stroke', g.color); fill.setAttribute('stroke-width', STROKE);
+    fill.setAttribute('stroke-dasharray', C); fill.setAttribute('stroke-dashoffset', C);
+    fill.setAttribute('filter', `url(#glow-${g.key})`); svg.appendChild(fill);
+
+    const center = document.createElement('div'); center.className = 'gauge-center';
+    const pctEl = document.createElement('div'); pctEl.className = 'gauge-pct'; pctEl.id = 'pct-' + g.key;
+    pctEl.style.fontSize = Math.max(11, Math.round(size * 0.21)) + 'px'; pctEl.textContent = '—';
+    const subEl = document.createElement('div'); subEl.className = 'gauge-sub'; subEl.id = 'sub-' + g.key;
+    center.appendChild(pctEl); center.appendChild(subEl);
+    wrap.appendChild(svg); wrap.appendChild(center);
+
+    g._fill = fill; g._circ = C; g._pctEl = pctEl; g._subEl = subEl;
+  }
+
+  function setGauge(g, pct) {
+    const v = Math.min(100, Math.max(0, pct));
+    if (!g._fill) return;
+    g._fill.style.strokeDashoffset = g._circ * (1 - v / 100);
+    g._pctEl.textContent = g.fmt(pct);
+    if (g._subEl) g._subEl.textContent = g.sub(pct);
+    const spark = document.getElementById('spark-' + g.key);
+    if (spark) spark.style.width = v + '%';
+  }
+
+  function getSize() {
+    const grid = document.getElementById('gauges-grid');
+    if (!grid) return 90;
+    const r = grid.getBoundingClientRect();
+    const cw = (r.width - 20) / 3, ch = (r.height - 10) / 2;
+    return Math.max(40, Math.floor(Math.min(cw, ch) * 0.60));
+  }
+
+  function buildAll() { const sz = getSize(); GAUGES.forEach(g => buildGauge(g, sz)); }
+
+  function tick() {
+    GAUGES.forEach(g => setGauge(g, g.sim()));
+    const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
+    const cl = document.getElementById('g-clock'), cl2 = document.getElementById('g-clock2');
+    if (cl) cl.textContent = ts;
+    if (cl2) cl2.textContent = ts;
+    const tok = Math.round(840 + Math.sin(Date.now()/2000)*55 + Math.random()*35);
+    const tEl = document.getElementById('g-tokens');
+    if (tEl) tEl.textContent = tok + ' tok/s';
+  }
+
+  requestAnimationFrame(() => { buildAll(); tick(); setInterval(tick, 600); });
+  window.addEventListener('resize', buildAll);
+})();
+</script>
+
+<!-- ═══════════════ inlined panel script: Agentic Harness ×4 ═══════════════ -->
+<script>
+(function () {
+  function makeHarness({ cv, wrap, logEl, activeEl, staggerMs }) {
+    const ctx = cv.getContext('2d');
+    let W = 1, H = 1;
+    const GOV_YF = 0.18, BUS_YF = 0.48, NODE_YF = 0.78, BUS_X0 = 0.02, BUS_X1 = 0.98;
+
+    const DEFS = [
+      { id: 'gov', label: 'Governor',  type: 'gov',    xf: 0.50, col: '#f5a623' },
+      { id: 'qa0', label: 'QA-1',      type: 'qa',     xf: 0.07, col: '#a855f7' },
+      { id: 'w0',  label: 'Worker-1',  type: 'worker', xf: 0.22, col: '#0096ff' },
+      { id: 'w1',  label: 'Worker-2',  type: 'worker', xf: 0.36, col: '#0096ff' },
+      { id: 'w2',  label: 'Worker-3',  type: 'worker', xf: 0.64, col: '#0096ff' },
+      { id: 'w3',  label: 'Worker-4',  type: 'worker', xf: 0.78, col: '#0096ff' },
+      { id: 'qa1', label: 'QA-2',      type: 'qa',     xf: 0.93, col: '#a855f7' },
+    ];
+    const WORKERS = DEFS.filter(d => d.type === 'worker').map(d => d.id);
+    const QAS = DEFS.filter(d => d.type === 'qa').map(d => d.id);
+    const nodes = {};
+    DEFS.forEach(d => { nodes[d.id] = { state: 'idle', glow: 0, workTimer: 0, spinAngle: 0 }; });
+
+    let packets = [], logLines = [], dispatchCd = 800 + staggerMs, heartbeatCd = 3500 + staggerMs * 0.5;
+
+    function rng(lo, hi) { return lo + Math.random() * (hi - lo); }
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function defOf(id) { return DEFS.find(d => d.id === id); }
+    function bY() { return BUS_YF * H; }
+    function nR() { return Math.min(W, H) * 0.062; }
+    function nx(id) { return defOf(id).xf * W; }
+    function ny(id) { return defOf(id).type === 'gov' ? GOV_YF * H : NODE_YF * H; }
+    function toRgba(hex, a) { const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; }
+    function idleWorkers() { return WORKERS.filter(id => nodes[id].state === 'idle'); }
+    function idleQAs() { return QAS.filter(id => nodes[id].state === 'idle'); }
+
+    function addLog(msg, col) {
+      logLines.unshift({ msg, col: col || '#64748b' });
+      if (logLines.length > 2) logLines.length = 2;
+      logEl.innerHTML = '';
+      logLines.forEach((l, i) => { const el = document.createElement('div'); el.className = 'ahq-log-line'; el.textContent = '› ' + l.msg; el.style.color = toRgba(l.col, i === 0 ? 0.9 : 0.35); logEl.appendChild(el); });
+    }
+
+    function spawnPacket(fromId, toId, col) {
+      const BY = bY(), fbx = nx(fromId), tbx = nx(toId), fy = ny(fromId), ty = ny(toId);
+      const s1 = Math.abs(fy - BY), s2 = Math.abs(fbx - tbx), s3 = Math.abs(BY - ty), total = s1 + s2 + s3 || 1;
+      packets.push({ pts: [{ x: fbx, y: fy }, { x: fbx, y: BY }, { x: tbx, y: BY }, { x: tbx, y: ty }], s1, s2, s3, total, prog: 0, speed: total * 0.72, col, done: false });
+    }
+
+    function packetPos(p) {
+      const d = p.prog, [A, B, C, D] = p.pts;
+      if (d <= p.s1) { const t = p.s1 > 0 ? d / p.s1 : 1; return { x: A.x + (B.x - A.x) * t, y: A.y + (B.y - A.y) * t }; }
+      if (d <= p.s1 + p.s2) { const t = p.s2 > 0 ? (d - p.s1) / p.s2 : 1; return { x: B.x + (C.x - B.x) * t, y: B.y }; }
+      const t = p.s3 > 0 ? (d - p.s1 - p.s2) / p.s3 : 1; return { x: C.x + (D.x - C.x) * t, y: C.y + (D.y - C.y) * t };
+    }
+
+    function dispatch() {
+      if (nodes['gov'].state !== 'idle') return;
+      const idle = idleWorkers(); if (!idle.length) return;
+      const wid = pick(idle);
+      nodes['gov'].state = 'sending'; nodes['gov'].workTimer = 400;
+      nodes[wid].state = 'receiving'; nodes[wid].workTimer = 300;
+      spawnPacket('gov', wid, '#f5a623'); addLog(`Gov → ${defOf(wid).label}`, '#f5a623');
+    }
+    function workerDone(wid) {
+      const qid = pick(idleQAs().length ? idleQAs() : QAS);
+      nodes[wid].state = 'sending'; nodes[wid].workTimer = 350;
+      nodes[qid].state = 'receiving'; nodes[qid].workTimer = 300;
+      spawnPacket(wid, qid, '#0096ff'); addLog(`${defOf(wid).label} → ${defOf(qid).label}`, '#0096ff');
+    }
+    function qaDone(qid) {
+      const accept = Math.random() > 0.22;
+      nodes[qid].state = 'sending'; nodes[qid].workTimer = 400;
+      if (accept) { nodes['gov'].state = 'receiving'; nodes['gov'].workTimer = 450; spawnPacket(qid, 'gov', '#a855f7'); addLog(`${defOf(qid).label} → Gov: ✓`, '#27c66f'); }
+      else { const wid = pick(idleWorkers().length ? idleWorkers() : WORKERS); nodes[wid].state = 'receiving'; nodes[wid].workTimer = 300; spawnPacket(qid, wid, '#e8394d'); addLog(`${defOf(qid).label}: ✗ retry`, '#e8394d'); }
+    }
+    function maybeHeartbeat() {
+      if (Math.random() > 0.4) return;
+      const active = WORKERS.filter(id => nodes[id].state === 'working');
+      if (active.length) spawnPacket(pick(active), 'gov', '#00c8b4');
+    }
+
+    function update(dt) {
+      DEFS.forEach(d => {
+        const n = nodes[d.id];
+        n.glow += ((n.state !== 'idle' ? 1 : 0) - n.glow) * Math.min(1, dt * 4);
+        if (n.state === 'idle') return;
+        n.workTimer -= dt * 1000;
+        if (n.state === 'working') { n.spinAngle += dt * 2.4; if (n.workTimer <= 0) { if (d.type === 'worker') workerDone(d.id); else if (d.type === 'qa') qaDone(d.id); else n.state = 'idle'; } }
+        else if (n.state === 'receiving') { if (n.workTimer <= 0) { if (d.type === 'worker') { n.state = 'working'; n.workTimer = rng(2500, 5000); } else if (d.type === 'qa') { n.state = 'working'; n.workTimer = rng(1200, 2400); } else n.state = 'idle'; } }
+        else if (n.state === 'sending' && n.workTimer <= 0) { n.state = 'idle'; }
+      });
+      packets = packets.filter(p => !p.done);
+      packets.forEach(p => { p.prog += p.speed * dt; if (p.prog >= p.total) { p.prog = p.total; p.done = true; } });
+      dispatchCd -= dt * 1000; if (dispatchCd <= 0) { dispatch(); dispatchCd = rng(1600, 3200); }
+      heartbeatCd -= dt * 1000; if (heartbeatCd <= 0) { maybeHeartbeat(); heartbeatCd = rng(4000, 7000); }
+      if (activeEl) { const n = DEFS.filter(d => nodes[d.id].state !== 'idle').length; activeEl.textContent = n + ' active'; }
+    }
+
+    function hexPath(x, y, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = Math.PI/3*i - Math.PI/6; i === 0 ? ctx.moveTo(x + r*Math.cos(a), y + r*Math.sin(a)) : ctx.lineTo(x + r*Math.cos(a), y + r*Math.sin(a)); } ctx.closePath(); }
+    function diamondPath(x, y, r) { ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r*0.78, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r*0.78, y); ctx.closePath(); }
+
+    function drawBus() {
+      const BY = bY(), x0 = BUS_X0 * W, x1 = BUS_X1 * W;
+      const bg = ctx.createLinearGradient(x0, BY, x1, BY);
+      bg.addColorStop(0, 'rgba(0,200,180,0)'); bg.addColorStop(0.06, 'rgba(0,200,180,0.10)'); bg.addColorStop(0.5, 'rgba(0,200,180,0.18)'); bg.addColorStop(0.94, 'rgba(0,200,180,0.10)'); bg.addColorStop(1, 'rgba(0,200,180,0)');
+      ctx.fillStyle = bg; ctx.fillRect(x0, BY - 7, x1 - x0, 14);
+      ctx.beginPath(); ctx.moveTo(x0, BY); ctx.lineTo(x1, BY); ctx.strokeStyle = 'rgba(0,200,180,0.32)'; ctx.lineWidth = 1.5; ctx.stroke();
+      packets.forEach(p => {
+        if (p.prog <= p.s1 || p.prog >= p.s1 + p.s2) return;
+        const bx0 = Math.min(p.pts[1].x, p.pts[2].x), bx1 = Math.max(p.pts[1].x, p.pts[2].x); if (bx0 === bx1) return;
+        const sg = ctx.createLinearGradient(bx0, 0, bx1, 0);
+        sg.addColorStop(0, toRgba(p.col, 0)); sg.addColorStop(0.2, toRgba(p.col, 0.7)); sg.addColorStop(0.8, toRgba(p.col, 0.7)); sg.addColorStop(1, toRgba(p.col, 0));
+        ctx.beginPath(); ctx.moveTo(bx0, BY); ctx.lineTo(bx1, BY); ctx.strokeStyle = sg; ctx.lineWidth = 2.5; ctx.stroke();
+      });
+      DEFS.forEach(d => {
+        const n = nodes[d.id], active = n.state !== 'idle';
+        const cnx = d.xf * W, cny = d.type === 'gov' ? GOV_YF * H : NODE_YF * H;
+        ctx.beginPath(); ctx.moveTo(cnx, BY); ctx.lineTo(cnx, cny);
+        ctx.strokeStyle = active ? toRgba(d.col, 0.42) : 'rgba(28,38,54,0.95)'; ctx.lineWidth = active ? 1.5 : 1;
+        if (active) { ctx.shadowColor = d.col; ctx.shadowBlur = 4; } ctx.stroke(); ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.arc(cnx, BY, active ? 4.5 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = active ? d.col : 'rgba(0,200,180,0.22)';
+        if (active) { ctx.shadowColor = d.col; ctx.shadowBlur = 8; } ctx.fill(); ctx.shadowBlur = 0;
+      });
+    }
+
+    function drawNode(d) {
+      const n = nodes[d.id];
+      const cnx = d.xf * W, cny = d.type === 'gov' ? GOV_YF * H : NODE_YF * H;
+      const R = nR(), r = d.type === 'gov' ? R * 1.28 : R, active = n.state !== 'idle';
+      if (n.glow > 0.01) { const gr = ctx.createRadialGradient(cnx, cny, r*0.3, cnx, cny, r*3.4); gr.addColorStop(0, toRgba(d.col, n.glow*0.40)); gr.addColorStop(1, toRgba(d.col, 0)); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cnx, cny, r*3.4, 0, Math.PI*2); ctx.fill(); }
+      ctx.save();
+      if (d.type === 'gov') hexPath(cnx, cny, r);
+      else if (d.type === 'qa') diamondPath(cnx, cny, r);
+      else { ctx.beginPath(); ctx.arc(cnx, cny, r, 0, Math.PI*2); }
+      ctx.fillStyle = toRgba(d.col, 0.09 + n.glow*0.22); ctx.fill();
+      ctx.strokeStyle = toRgba(d.col, 0.36 + n.glow*0.54); ctx.lineWidth = 1.5 + n.glow;
+      ctx.shadowColor = d.col; ctx.shadowBlur = n.glow*10; ctx.stroke(); ctx.shadowBlur = 0; ctx.restore();
+      if (n.state === 'working') { ctx.save(); ctx.beginPath(); ctx.arc(cnx, cny, r+6, n.spinAngle, n.spinAngle + Math.PI*1.3); ctx.strokeStyle = toRgba(d.col, 0.8); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.shadowColor = d.col; ctx.shadowBlur = 7; ctx.stroke(); ctx.shadowBlur = 0; ctx.restore(); }
+      if (n.state === 'receiving') { const phase = (Date.now()/500) % 1; ctx.save(); ctx.beginPath(); ctx.arc(cnx, cny, r+3+phase*r*1.4, 0, Math.PI*2); ctx.strokeStyle = toRgba(d.col, 0.36*(1-phase)); ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
+      ctx.beginPath(); ctx.arc(cnx + r*0.64, cny - r*0.64, 3, 0, Math.PI*2); ctx.fillStyle = active ? d.col : 'rgba(20,30,44,1)'; if (active) { ctx.shadowColor = d.col; ctx.shadowBlur = 7; } ctx.fill(); ctx.shadowBlur = 0;
+      const ls = Math.max(7, Math.round(R*0.48)), ly = cny + r + Math.round(R*0.68);
+      ctx.font = `600 ${ls}px "JetBrains Mono",monospace`; ctx.textAlign = 'center';
+      ctx.fillStyle = active ? toRgba(d.col, 0.9) : 'rgba(100,116,139,0.8)'; ctx.fillText(d.label, cnx, ly);
+      const ss = Math.max(6, Math.round(R*0.36)); ctx.font = `${ss}px "JetBrains Mono",monospace`;
+      ctx.fillStyle = active ? toRgba(d.col, 0.50) : 'rgba(40,52,70,0.9)';
+      const stMap = { idle: 'IDLE', working: 'BUSY', receiving: 'RECV', sending: 'SEND' };
+      ctx.fillText(stMap[n.state] || '', cnx, ly + Math.round(R*0.54));
+    }
+
+    function drawPackets() {
+      packets.forEach(p => {
+        const pos = packetPos(p);
+        const gr = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 15);
+        gr.addColorStop(0, toRgba(p.col, 0.80)); gr.addColorStop(0.3, toRgba(p.col, 0.45)); gr.addColorStop(1, toRgba(p.col, 0));
+        ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(pos.x, pos.y, 15, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(pos.x, pos.y, 4, 0, Math.PI*2); ctx.fillStyle = '#ffffff'; ctx.shadowColor = p.col; ctx.shadowBlur = 12; ctx.fill(); ctx.shadowBlur = 0;
+      });
+    }
+
+    function render() { ctx.clearRect(0, 0, W, H); drawBus(); DEFS.forEach(drawNode); drawPackets(); }
+
+    let lastT = performance.now(), raf = null;
+    function loop(ts) { const dt = Math.min((ts - lastT) / 1000, 0.05); lastT = ts; render(); update(dt); raf = requestAnimationFrame(loop); }
+
+    const ro = new ResizeObserver(() => { const rect = wrap.getBoundingClientRect(); W = cv.width = Math.max(1, Math.floor(rect.width)); H = cv.height = Math.max(1, Math.floor(rect.height)); });
+    ro.observe(wrap);
+    const r0 = wrap.getBoundingClientRect();
+    W = cv.width = Math.max(1, Math.floor(r0.width)); H = cv.height = Math.max(1, Math.floor(r0.height));
+    setTimeout(() => { lastT = performance.now(); raf = requestAnimationFrame(loop); }, staggerMs);
+  }
+
+  const staggerMs = [0, 550, 1100, 1650];
+  ['ahq-0', 'ahq-1', 'ahq-2', 'ahq-3'].forEach((id, i) => {
+    const cell = document.getElementById(id);
+    if (!cell) return;
+    makeHarness({ cv: cell.querySelector('.ahq-cv'), wrap: cell.querySelector('.ahq-canvas-wrap'), logEl: cell.querySelector('.ahq-log'), activeEl: cell.querySelector('.ahq-active'), staggerMs: staggerMs[i] });
+  });
+})();
+</script>
+
+</body>
+</html>
